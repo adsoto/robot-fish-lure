@@ -4,6 +4,11 @@ import numpy as np
 import os
 import glob
 
+"""DO NOT USE TO CALIBRATE CHANGES IN LAB SETUP
+only utlize this when cmaera or lesnse changes.
+used to undistort camera images for image processing
+takes into account distortion/fisheye effect of the camera lens and undistorts it using a checkerboard image and finding and distortion factor"""
+
 # Defining the dimensions of checkerboard
 CHECKERBOARD = (6,8)
 criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)

@@ -1,3 +1,5 @@
+#File to flash onto transmitter microbit. Paste into main.py as needed. Use summer 2023 code documentation
+
 from microbit import *
 import radio
 

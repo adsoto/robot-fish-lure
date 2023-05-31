@@ -1,4 +1,6 @@
 # microbit-module: cyberbot@0.9.2
+"""cyberbot library to import from
+gets loaded onto cyberbot when programs are flashed onto the cyberbot"""
 from microbit import *
 while True:
 	try:i2c.read(93,1)

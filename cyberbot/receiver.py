@@ -1,3 +1,5 @@
+#File to flash onto reciever microbit. Paste into main.py as needed. Use summer 2023 code documentation
+
 # terminal_controlled_bot_wireless
 from microbit import *
 from cyberbot import *

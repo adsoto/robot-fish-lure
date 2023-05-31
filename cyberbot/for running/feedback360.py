@@ -1,4 +1,5 @@
 # microbit-module: feedback360@0.8.0
+"""library for parallax 360 feedback motors. Should be imported onto microbit transmitter and reciever initially"""
 from cyberbot import *
 class drive():
 	def __init__(self,p=0):

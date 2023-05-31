@@ -2,6 +2,9 @@
 import cv2
 import numpy as np
 
+"""Carries out image processing for robot. Intakes image from above-tank camera, greyscales it,
+and uses threshold values to identify robot position and trajectory"""
+
 mtx = np.array([[1.05663779e+03, 0.00000000e+00, 9.73055094e+02],
  [0.00000000e+00, 1.05269643e+03, 5.64799418e+02],
  [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]])

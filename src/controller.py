@@ -1,6 +1,9 @@
 
 # new object-oriented general controller
 
+"""Main file for running robotic fish. Power robot on, then run controller to carry out image processing, 
+velocity tracking/calculation, and transmitting speeds to robot over radio"""
+
 import numpy as np
 import serial
 import time
@@ -14,7 +17,7 @@ class Controller():
 
     def __init__(self, lookahead=20, spacing=.001, plot_data=True, save_data=True,
                  total_time=30, camera_port=0, camera_bounds = np.array([[420, 365], [1340, 905]]),
-                 save_video=False, transmit_port='/dev/tty.usbmodem14102'):
+                 save_video=False, transmit_port='/dev/tty.usbmodem11402'):
         print("initializing controller")
         self._ser = serial.Serial(transmit_port, baudrate=115200)
         self._lookahead = lookahead
@@ -27,7 +30,7 @@ class Controller():
     def _make_path(self, spacing, total_time):
         """Interpolates points to construct a continuous path for the bot to follow"""
         
-        points = rect_points
+        points = line_points
         lengths = []
         for i in range(0, len(points)-1):
             lengths.append(int(np.linalg.norm(points[i+1]-points[i])/spacing))
@@ -104,7 +107,7 @@ class Controller():
 
 if __name__ == '__main__':
     bounds = np.array([[593,  322], [1410, 794]])   # find these with calibrate_setup.py
-    port_t = '/dev/tty.usbmodem1402'                # find this with ls /dev/tty.usb*
+    port_t = '/dev/tty.usbmodem11402'                # find this with ls /dev/tty.usb*   Change this port as needed
     port_c = 0                                      # either 0 or 1
     c = Controller(camera_bounds = bounds, camera_port = port_c, transmit_port = port_t,
                    lookahead = 10, total_time = 10)

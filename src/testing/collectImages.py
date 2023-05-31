@@ -1,6 +1,8 @@
 
 import cv2
 
+"""used to take checkerboard images for camera-calibration and undistortion"""
+
 cap = cv2.VideoCapture(0)
 
 i = 0

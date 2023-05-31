@@ -1,6 +1,10 @@
 import cv2
 import numpy as np
 
+"""Used when tank/image that the camera processes changes. DO NOT alter camera calibration when setup
+changes location.
+Run this and HARD CLICK opposite corners to define the robot's driving space. See code documentation in drive"""
+
 MTX = np.array([[1.05663779e+03, 0.00000000e+00, 9.73055094e+02],
  [0.00000000e+00, 1.05269643e+03, 5.64799418e+02],
  [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]])
@@ -30,10 +34,13 @@ ret, frame = cap.read()
 frame = cv2.undistort(frame, MTX, DIST, None, MTX)
 resized = cv2.resize(frame, (960, 540))
 
+# HARD CLICK a corner, then press g to save and setup the next point.
+# HARD CLICK opposite diagonal corner, then press g to save and exit.
+
 [x1, y1] = get_click(frame)
 [x2, y2] = get_click(frame)
 
-print(np.array([[x1, y1], [x2, y2]]))
+print(np.array([[x1, y1], [x2, y2]])) # Generates array of video from size, input into controller file for image processing
 cropped = frame[y1:y2, x1:x2]
 resized = cv2.resize(cropped, (960, 540))
 cv2.imshow('image', resized)

@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+"""Generate matplot of desired paths for robot"""
+
 PIX2METERS = .842/1071
 
 path_points = np.array([[100,700],
