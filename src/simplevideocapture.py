@@ -18,6 +18,9 @@ if (video.isOpened() == False):
 frame_width = int(video.get(3))
 frame_height = int(video.get(4))
 
+print("height:",frame_height)
+print("width:",frame_width)
+
 # generates date and time info for the video filename
 size = (frame_width, frame_height)
 now = str(datetime.now())
