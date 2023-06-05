@@ -10,7 +10,8 @@ how do we get it to outline the binary black parts with 1) green, 2) as blobs?
 
 how to sort them??
 
-6.5.23 - alisha, updated binary vid to include blobs 
+6.5.23 - alisha, updated binary vid to include blobs overlaid on binary background
+also outputs binary video that can be played in Quick Time Player
     *note that halfway through video when fish goes over clay rectangle, blob becomes one
 
 """
@@ -74,6 +75,8 @@ cap.set(cv.CAP_PROP_POS_FRAMES, 0)
 # Get first frame for setting up output video
 ret, frame_init = cap.read()
 
+imglist = []
+
 # running the loop
 while True:
     print('entered')
@@ -122,9 +125,23 @@ while True:
         thresh_copy = cv2.cvtColor(thresh_img, cv2.COLOR_BGR2RGB)
         overlay = cv.drawContours(thresh_copy, contours, -1, (0,255,0), 3) 
         cv.imshow('draw countours on binary',overlay)
-        cv.waitKey(0) #change to 0 to click through frames
 
+        cv.imwrite("/Users/alishachulani/Desktop/image.png", thresh_img)
+
+        cv.waitKey(1) #change to 0 to click through frames
         cv.destroyAllWindows()
+
+        imgx = cv2.imread("/Users/alishachulani/Desktop/image.png")
+        height, width, layers = imgx.shape
+        size = (width,height)
+        imglist.append(imgx)
+
+
+out = cv2.VideoWriter('project.avi',cv2.VideoWriter_fourcc(*'MJPG'), 15, size)
+ 
+for i in range(len(imglist)):
+    out.write(imglist[i])
+out.release()
 
 """blob outlining testing 
 first displays binary image 
