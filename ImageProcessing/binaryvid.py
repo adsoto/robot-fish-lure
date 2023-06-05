@@ -1,5 +1,6 @@
 import numpy as np
 import cv2 as cv
+import cv2
 import sys
 import os
 
@@ -8,6 +9,9 @@ currently outputs a binary video
 how do we get it to outline the binary black parts with 1) green, 2) as blobs?
 
 how to sort them??
+
+6.5.23 - alisha, updated binary vid to include blobs 
+    *note that halfway through video when fish goes over clay rectangle, blob becomes one
 
 """
 vidpath = '/Users/alishachulani/Desktop/supertrimmed6.2.mp4'
@@ -30,15 +34,54 @@ if not cap.isOpened():
     sys.exit(
         'Video file cannot be read! Please check input_vidpath to ensure it is correctly pointing to the video file')
     
+bg_model = cv.createBackgroundSubtractorKNN(history=800, dist2Threshold=1.0, detectShadows=True)
+
+while True:
+    # Capture frame-by-frame
+    ret, frame = cap.read()
+
+    if not ret:
+        break
+
+    # Convert current frame to grayscale
+    frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+
+    # Extract current frame number
+    frame_curr = cap.get(1)
+
+    if ret:
+        # Apply background model, returns binary foreground image
+        # we can fiddle with the second input or leave empty
+        # fgmask = bg_model.apply(frame, 0.6)
+        fgmask = bg_model.apply(frame)
+
+        # Get background image
+        bg_im = bg_model.getBackgroundImage()
+
+        if cv.waitKey(30) & 0xFF == ord('q'):
+            break
+
+    # Save background image and Break loop after max frames
+    if frame_curr >= ind_max:
+        # Write background image
+        cv.imwrite("/Users/alishachulani/Desktop/video_background.png", bg_im)
+
+    print('done')
+    
+
+
+cap.set(cv.CAP_PROP_POS_FRAMES, 0)
 # Get first frame for setting up output video
 ret, frame_init = cap.read()
 
 # running the loop
 while True:
+    print('entered')
     # Capture frame-by-frame
     ret, frame = cap.read()
     # Bail out when the video file ends
     if not ret:
+        print('broke')
         break
 
     # Extract current frame number
@@ -74,10 +117,13 @@ while True:
 
         print("Number of Contours found = " + str(len(contours)))
 
-        overlay = cv.drawContours(original, contours, -1, (0,255,0), 3) 
-        ##looks like here, it saves the outlines but puts the outlining through the thresholding which makes it black again
+        copy = bg_im.copy()
+
+        thresh_copy = cv2.cvtColor(thresh_img, cv2.COLOR_BGR2RGB)
+        overlay = cv.drawContours(thresh_copy, contours, -1, (0,255,0), 3) 
         cv.imshow('draw countours on binary',overlay)
-        cv.waitKey(1) #change to 0 to click through frames
+        cv.waitKey(0) #change to 0 to click through frames
+
         cv.destroyAllWindows()
 
 """blob outlining testing 
