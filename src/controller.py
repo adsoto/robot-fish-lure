@@ -30,7 +30,7 @@ class Controller():
     def _make_path(self, spacing, total_time):
         """Interpolates points to construct a continuous path for the bot to follow"""
         
-        points = line_points
+        points = forward_and_change #change what path the robot follows from paths.py file here
         lengths = []
         for i in range(0, len(points)-1):
             lengths.append(int(np.linalg.norm(points[i+1]-points[i])/spacing))

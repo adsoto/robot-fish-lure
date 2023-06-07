@@ -40,6 +40,12 @@ rect_points = np.array([[.05, .08],
                         [.5, .08],
                         [.5, .3],
                         [.05, .3]])
+
+
+forward_and_change = np.array([[.05, .08],
+                               [.2, .08],
+                               [.4, .15]])
+
 #STANDARD RECTANGLE
 # rect_points = np.array([[100, 100],
 #                         [700, 100],
