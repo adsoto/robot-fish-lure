@@ -10,6 +10,7 @@ import time
 from point_tracker import track_point
 from paths import *
 import data_handler as dh
+import matplotlib.pyplot as plt
 import video_processor as vp
 
 class Controller():
@@ -30,7 +31,7 @@ class Controller():
     def _make_path(self, spacing, total_time):
         """Interpolates points to construct a continuous path for the bot to follow"""
         
-        points = line_points
+        points = forward_and_change #change what path the robot follows from paths.py file here
         lengths = []
         for i in range(0, len(points)-1):
             lengths.append(int(np.linalg.norm(points[i+1]-points[i])/spacing))
@@ -98,8 +99,9 @@ class Controller():
         xdes = [pos[0] for pos in self._path]
         ydes = [pos[1] for pos in self._path]
 
-        self._data_handler.add_series('desired path', xdes, ydes, 'x position', 'y position')
-        self._data_handler.add_series('robot position', x, y, 'x position', 'y position')
+        #self._data_handler.add_series('desired path', xdes, ydes, 'x position', 'y position')
+        #self._data_handler.add_series('robot position', x, y, 'x position', 'y position')
+        self._data_handler.add_dual_series('positions', xdes, ydes, x, y, 'x', 'y')
         self._data_handler.add_series('robot velocity', self._time_arr[1:], v, 'time', 'velocity')
         self._data_handler.run()
 
