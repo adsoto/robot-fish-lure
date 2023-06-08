@@ -10,6 +10,7 @@ import time
 from point_tracker import track_point
 from paths import *
 import data_handler as dh
+import matplotlib.pyplot as plt
 import video_processor as vp
 
 class Controller():
@@ -98,8 +99,9 @@ class Controller():
         xdes = [pos[0] for pos in self._path]
         ydes = [pos[1] for pos in self._path]
 
-        self._data_handler.add_series('desired path', xdes, ydes, 'x position', 'y position')
-        self._data_handler.add_series('robot position', x, y, 'x position', 'y position')
+        #self._data_handler.add_series('desired path', xdes, ydes, 'x position', 'y position')
+        #self._data_handler.add_series('robot position', x, y, 'x position', 'y position')
+        self._data_handler.add_dual_series('positions', xdes, ydes, x, y, 'x', 'y')
         self._data_handler.add_series('robot velocity', self._time_arr[1:], v, 'time', 'velocity')
         self._data_handler.run()
 

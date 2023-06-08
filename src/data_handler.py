@@ -11,6 +11,7 @@ class DataHandler():
         self._plot = plot
         self._save = save
         self._data = {}
+        self._dualdata = {}
 
     def add_series(self, name, ind, dep, xlabel, ylabel):
         """Adds a new data series to the DataHandler dictionary of data series
@@ -20,6 +21,9 @@ class DataHandler():
 
         new_series = Series(ind, dep, xlabel, ylabel)
         self._data[name] = new_series
+
+    def add_dual_series(self, name, ind1, dep1, ind2, dep2, xlabel, ylabel):
+        self._dualdata[name] = (ind1, dep1, ind2, dep2, xlabel, ylabel)
 
     def make_plots(self):
         """Produces plots for each of the data series"""
@@ -33,6 +37,17 @@ class DataHandler():
             plt.legend(loc="upper left")
             plt.axis('scaled')
         plt.show()
+
+    def make_dual_plots(self):
+        fig = plt.figure()
+        ax1 = fig.add_subplot(111)
+        for index, name in enumerate(self._dualdata):
+            series = self._dualdata[name]
+            ax1.scatter(series[0], series[1])
+            ax1.scatter(series[2], series[3])
+            plt.legend(loc='upper left')
+        plt.show()
+
 
     def save_data(self):
         """Saves all data series to the data directory"""
@@ -55,7 +70,9 @@ class DataHandler():
 
     def run(self):
         if self._plot: self.make_plots()
+        if self._plot: self.make_dual_plots()
         if self._save: self.save_data()
+
 
 class Series():
     """Class definition for data series"""
