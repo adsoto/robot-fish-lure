@@ -4,28 +4,48 @@ import numpy as np
 # Note most of these are in pixels, not meters
 
 #OUT AND BACK
-line_points = np.array([[100, 250],
-                        [700, 250],
-                        [100, 250]])
+line_points_m = np.array([[0.05, 0.15],
+                        [0.4, 0.15],
+                        [0.05, 0.15]])
 line_times = [0, 4, 8]
+
+# move straight then change angle and move straight
+forward_and_change = np.array([[0.15, 0.08],
+                               [0.3, 0.08],
+                               [0.5, 0.15]])
+# straight line across middle of tank
+straight_line = np.array([[0.05, 0.125],
+                          [0.5, 0.125]])
+
+# arc CCW then arc CW
+arc_scurve_points = np.array([[0.115, 0.15/2+0.1],
+                                 [0.147, 0.066/2+0.1],
+                                 [0.24, 0.025/2+0.1],
+                                 [0.365, 0.15/2+0.1],
+                                 [0.4, 0.237/2+0.1],
+                                 [0.49, 0.275/2+0.1],
+                                 [0.58, 0.237/2+0.1],
+                                 [0.615, 0.15/2+0.1]])
+
+
 
 
 #ARC OUT AND BACK
-arc_points = np.array([[100, 250],
-                       [200, 212],
-                       [300, 190],
-                       [400, 183],
-                       [500, 190],
-                       [600, 212],
-                       [700, 250],
-                       [650, 269],
-                       [600, 288],
-                       [500, 310],
-                       [400, 317],
-                       [300, 310],
-                       [200, 288],
-                       [100, 250]])
-arc_times = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+# arc_points = np.array([[100, 250],
+#                        [200, 212],
+#                        [300, 190],
+#                        [400, 183],
+#                        [500, 190],
+#                        [600, 212],
+#                        [700, 250],
+#                        [650, 269],
+#                        [600, 288],
+#                        [500, 310],
+#                        [400, 317],
+#                        [300, 310],
+#                        [200, 288],
+#                        [100, 250]])
+# arc_times = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
 
 #SINGLE TURN
 turn_points = np.array([[100, 100],
