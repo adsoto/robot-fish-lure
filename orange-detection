@@ -1,0 +1,46 @@
+"""recognizes certain colors of the camera capture"""
+
+import cv2 
+import numpy as np 
+
+path = r"/Users/loaner/Desktop/Screen Shot 2023-06-08 at 4.12.54 PM.png"
+
+cap = cv2.VideoCapture(0)
+
+while True:
+
+    ret,frame =cap.read() 
+    
+    if ret:
+    #255, 165, 0
+
+        into_hsv =cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
+
+        lower_orange= np.array([10, 100, 20], dtype = "uint8") 
+
+        upper_orange= np.array([25, 255, 255], dtype = "uint8")
+
+        b_mask=cv2.inRange(into_hsv,lower_orange,upper_orange)
+        # creating the mask using inRange() function
+        # this will produce an image where the color of the objects
+        # falling in the range will turn white and rest will be black
+        orange=cv2.bitwise_and(frame,frame,mask=b_mask)
+
+        #cv2.imshow('Original',frame) # to display the original frame
+        cv2.imshow('Orange Detection Mask',orange) 
+
+        #mask = cv2.inRange(hsvFrame, lower_orange, upper_orange)
+
+        #detected_output = cv2.bitwise_and(frame, frame, mask =  mask) 
+
+        #cv2.imshow("orange color detection", detected_output) 
+    
+    else: break
+
+    if cv2.waitKey(10) & 0xFF == ord('q'):
+        
+        break
+
+cap.release()
+  
+cv2.destroyAllWindows()
