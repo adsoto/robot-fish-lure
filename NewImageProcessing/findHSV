@@ -1,0 +1,12 @@
+"""finds the HSV values of an image from BGR"""
+
+import cv2
+import numpy as np
+
+orange = np.uint8([[[3, 144, 252]]])
+
+HSVorange = cv2.cvtColor(orange, cv2.COLOR_BGR2HSV)
+
+print("HSV of orange:", HSVorange)
+print(type(HSVorange))
+
