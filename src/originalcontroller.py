@@ -22,12 +22,12 @@ class Controller():
 
    def __init__(self, lookahead=20, spacing=.001, plot_data=True, save_data=True,
                 total_time=30, camera_port=0, camera_bounds = np.array([[420, 365], [1340, 905]]),
-                save_video=True, transmit_port='/dev/tty.usbmodem102'):
+                save_video=False, transmit_port='/dev/tty.usbmodem1102'):
        print("initializing controller")
        self._ser = serial.Serial(transmit_port, baudrate=115200)
        self._lookahead = lookahead
        self._data_handler = dh.DataHandler(plot_data, save_data)
-       self._video = orange.VideoProcessor(camera_port, camera_bounds, save_video)
+       self._video = vp.VideoProcessor(camera_port, camera_bounds, save_video)
        self._make_path(spacing, total_time)
        self._robot_arr = []
        self._time_arr = []
@@ -63,8 +63,6 @@ class Controller():
 
    def find_target(self, currentTime):
        """Finds the next target in the path for the bot to track"""
-
-
        timeDists = [abs(time-currentTime) for time in self._times]
        timeDistance = min(timeDists)
        closest = timeDists.index(timeDistance)
@@ -73,11 +71,8 @@ class Controller():
 
    def run(self):
        """Runs the bot"""
-
-
        start_time = time.time()
        targetIndex = self._lookahead
-
 
        while targetIndex < len(self._path):
            [head, tail] = self._video.get_coords(2)
@@ -86,12 +81,10 @@ class Controller():
            robot_pos = (head + tail)/2
            currentTime = time.time() - start_time
 
-
            target = self._path[targetIndex]
            [vRight, vLeft] = track_point(robot_pos, target, theta, 0) # note theta_des = 0
           
            targetIndex = self.find_target(currentTime)
-
 
            if self._video._go:
                self._time_arr.append(currentTime)
@@ -120,21 +113,17 @@ class Controller():
 
        #self._data_handler.add_series('desired path', xdes, ydes, 'x position', 'y position')
        #self._data_handler.add_series('robot position', x, y, 'x position', 'y position')
-       # emily commented these out
-
-
-       ## working plots but not saving data properly
        self._data_handler.add_dual_series('Position', xdes, ydes, x, y, 'x (m)', 'y (m)')
        self._data_handler.add_dual_series('X-Pos vs. Time', self._times, xdes, self._time_arr, x, 'time(s)', "x (m)")
        self._data_handler.add_dual_series('Y-Pos vs. Time', self._times, ydes, self._time_arr, y, 'time(s)', "y (m)")
        self._data_handler.add_series('Theta vs. Time', self._time_arr, self._theta_arr, 'time(s)', 'theta')
        self._data_handler.add_series('Robot Velocity', self._time_arr[1:], v, 'time (s)', 'velocity (m/s)')
        self._data_handler.run()
-       
+
 
 if __name__ == '__main__':
    bounds = np.array([[720,  435], [1592, 778]])   # find these with calibrate_setup.py
-   port_t = '/dev/tty.usbmodem102'                # find this with ls /dev/tty.usb*   Change this port as needed
+   port_t = '/dev/tty.usbmodem1102'                # find this with ls /dev/tty.usb*   Change this port as needed
    port_c = 0                                      # either 0 or 1
    c = Controller(camera_bounds = bounds, camera_port = port_c, transmit_port = port_t,
                   lookahead = 10, total_time = 10)
