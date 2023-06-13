@@ -90,8 +90,9 @@ class DataHandler():
         
         data = {}
         for name, series in self._data.items():
-            data[name + '_ind'] = series._ind
-            data[name + '_dep'] = series._dep
+            data[name + ': ' + series._xlabel] = series._ind
+            data[name + ': ' + series._ylabel] = series._dep
+
 
         df = pd.DataFrame.from_dict(data, orient='index')
         df = df.transpose()

@@ -112,10 +112,20 @@ class Controller():
        # emily commented these out
 
 
-       ## working plots but not saving data properly
+       ## overlay plots desired and actual position over time
        self._data_handler.add_dual_series('Position', xdes, ydes, x, y, 'x (m)', 'y (m)')
        self._data_handler.add_dual_series('X-Pos vs. Time', self._times, xdes, self._time_arr, x, 'time(s)', "x (m)")
        self._data_handler.add_dual_series('Y-Pos vs. Time', self._times, ydes, self._time_arr, y, 'time(s)', "y (m)")
+       
+        ## add series saves raw data and then creates plots through data_handler.py
+       self._data_handler.add_series('Desired Position', xdes, ydes,'x (m)', 'y (m)')
+       self._data_handler.add_series('Actual Position', x, y,'x (m)', 'y (m)')
+    #    self._data_handler.add_series('Desired X-Pos vs. Time', self._times, xdes, 'time(s)', "x (m)")
+    #    self._data_handler.add_series('Actual X-Pos vs. Time', self._time_arr, x, 'time(s)', "x (m)")
+
+    #    self._data_handler.add_series('Desired Y-Pos vs. Time', self._times, ydes, 'time(s)', "y (m)")
+    #    self._data_handler.add_series('Actual Y-Pos vs. Time', self._time_arr, y, 'time(s)', "y (m)")
+
        self._data_handler.add_series('Theta vs. Time', self._time_arr, self._theta_arr, 'time(s)', 'theta')
        self._data_handler.add_series('Robot Velocity', self._time_arr[1:], v, 'time (s)', 'velocity (m/s)')
        self._data_handler.run()
@@ -123,6 +133,7 @@ class Controller():
 
 if __name__ == '__main__':
    bounds = np.array([[720,  435], [1592, 778]])   # find these with calibrate_setup.py
+
    port_t = '/dev/tty.usbmodem14102'                # find this with ls /dev/tty.usb*   Change this port as needed
    port_c = 0                                      # either 0 or 1
    c = Controller(camera_bounds = bounds, camera_port = port_c, transmit_port = port_t,
