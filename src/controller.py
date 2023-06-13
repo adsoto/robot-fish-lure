@@ -1,10 +1,10 @@
-# new object-oriented general controller
-
-
 """Main file for running robotic fish. Power robot on, then run controller to carry out image processing,
 velocity tracking/calculation, and transmitting speeds to robot over radio"""
 
+"""This new (summer 2023) controller was edited to follow ORANGE dots on the robot -- it calls orange.py as the videoprocessor. This controller and orange.py saves video when save_video = True.
 
+Declans version is called "originalcontroller.py" and utilizes videoprocessor.py to follow black dots. It also DOES NOT save video.
+"""
 import numpy as np
 import serial
 import time
@@ -15,14 +15,12 @@ import matplotlib.pyplot as plt
 import video_processor as vp
 import orange as orange
 
-
 class Controller():
    """Top-level class to run the robotic fish"""
 
-
    def __init__(self, lookahead=20, spacing=.001, plot_data=True, save_data=True,
                 total_time=30, camera_port=0, camera_bounds = np.array([[420, 365], [1340, 905]]),
-                save_video=True, transmit_port='/dev/tty.usbmodem102'):
+                save_video=True, transmit_port='/dev/tty.usbmodem14102'):
        print("initializing controller")
        self._ser = serial.Serial(transmit_port, baudrate=115200)
        self._lookahead = lookahead
@@ -32,7 +30,6 @@ class Controller():
        self._robot_arr = []
        self._time_arr = []
        self._theta_arr = []
-
 
    def _make_path(self, spacing, total_time):
        """Interpolates points to construct a continuous path for the bot to follow"""
@@ -46,35 +43,27 @@ class Controller():
        self._times = np.linspace(0, total_time, total_length) ## np.linspace creates evenly spaced intervals over specified interval.
        self._path = np.empty([total_length, 2])
 
-
        for i in range(0, len(points)-1):
            start_idx = sum(lengths[0:i])
            self._path[start_idx:start_idx+lengths[i],:] = np.linspace(points[i], points[i+1], lengths[i], endpoint=False)
       
    def send_commands(self, vR, vL):
        """Sends commands to the transmit board over the serial port"""
-
-
        print("vL = " + str(vL) + ", vR = " + str(vR))
        dict = {'vL': vL, 'vR' : vR}
        packet = str(dict) + "\r"
        self._ser.write(packet.encode())
 
-
    def find_target(self, currentTime):
        """Finds the next target in the path for the bot to track"""
-
 
        timeDists = [abs(time-currentTime) for time in self._times]
        timeDistance = min(timeDists)
        closest = timeDists.index(timeDistance)
        return closest + self._lookahead
 
-
    def run(self):
        """Runs the bot"""
-
-
        start_time = time.time()
        targetIndex = self._lookahead
 
@@ -144,7 +133,8 @@ class Controller():
 
 if __name__ == '__main__':
    bounds = np.array([[720,  435], [1592, 778]])   # find these with calibrate_setup.py
-   port_t = '/dev/tty.usbmodem11102'                # find this with ls /dev/tty.usb*   Change this port as needed
+
+   port_t = '/dev/tty.usbmodem14102'                # find this with ls /dev/tty.usb*   Change this port as needed
    port_c = 0                                      # either 0 or 1
    c = Controller(camera_bounds = bounds, camera_port = port_c, transmit_port = port_t,
                   lookahead = 10, total_time = 10)
