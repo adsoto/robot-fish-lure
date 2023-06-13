@@ -123,13 +123,12 @@ class Controller():
        # emily commented these out
 
 
-       ## working plots but not saving data properly
        ## overlay plots desired and actual position over time
        self._data_handler.add_dual_series('Position', xdes, ydes, x, y, 'x (m)', 'y (m)')
        self._data_handler.add_dual_series('X-Pos vs. Time', self._times, xdes, self._time_arr, x, 'time(s)', "x (m)")
        self._data_handler.add_dual_series('Y-Pos vs. Time', self._times, ydes, self._time_arr, y, 'time(s)', "y (m)")
        
-
+        ## add series saves raw data and then creates plots through data_handler.py
        self._data_handler.add_series('Desired Position', xdes, ydes,'x (m)', 'y (m)')
        self._data_handler.add_series('Actual Position', x, y,'x (m)', 'y (m)')
     #    self._data_handler.add_series('Desired X-Pos vs. Time', self._times, xdes, 'time(s)', "x (m)")
