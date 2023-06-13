@@ -22,15 +22,23 @@ class VideoProcessor:
         self._go = True # not implemented
         self._current_frame = None
         self._bounds = camera_bounds
-        if save_video: # not tested
-            now = datetime.now()
-            video_folder = 'data/' + now.strftime("%m.%d.%Y/")
-            video_filename = 'data/' + now.strftime("%m.%d.%Y/%H.%M") + '.mp4'
+
+        if save_video == True: # not tested            
+            size = np.diff(camera_bounds, axis=0)
+            now = str(datetime.now())
+            filename = str(now[0:19])
+            daymonthyear = datetime.now()
+            date = str(daymonthyear)
+            display = date[:10]
+
+            video_folder = 'data/' + display
+            video_filename = 'data/' + filename + '.avi'
+ 
+            #result = cv2.VideoWriter(video_filename +".avi",cv2.VideoWriter_fourcc(*'MJPG'),FPS, (size[0][0],size[0][1]))
             if not os.path.exists(video_folder):
                 os.makedirs(video_folder)
-            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-            size = np.diff(camera_bounds, axis=0)
-            self._out = cv2.VideoWriter(video_filename, fourcc, FPS, (size[0][0],size[0][1]))
+            
+            self._out = cv2.VideoWriter(video_filename, cv2.VideoWriter_fourcc(*'MJPG'), FPS, (size[0][0],size[0][1]))
 
     def get_coords(self, num_objects):
         """Finds the n largest dark objects and returns their centroids in order"""

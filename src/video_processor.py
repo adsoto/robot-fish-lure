@@ -22,7 +22,7 @@ class VideoProcessor:
         self._go = True # not implemented
         self._current_frame = None
         self._bounds = camera_bounds
-        if save_video: # not tested
+        if save_video == True: # not tested
             now = datetime.now()
             video_folder = 'data/' + now.strftime("%m.%d.%Y/")
             video_filename = 'data/' + now.strftime("%m.%d.%Y/%H.%M") + '.mp4'
