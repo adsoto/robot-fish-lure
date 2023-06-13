@@ -3,7 +3,6 @@
 Source code from: https://www.geeksforgeeks.org/saving-a-video-using-opencv/  
 Modified to change the filename and extension."""
 
-
 import cv2
 from datetime import *
 
