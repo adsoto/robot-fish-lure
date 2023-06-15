@@ -5,12 +5,23 @@ import numpy as np
 # Note most of these are in pixels, not meters
 
 
-#OUT AND BACK
+#OUT AND BACK in middle of tank
 line_points_m = np.array([[0.05, 0.15],
                        [0.4, 0.15],
                        [0.05, 0.15]])
 line_times = [0, 4, 8]
 
+#OUT AND BACK on side of tank
+line_points_side = np.array([[0.05, 0.2],
+                       [0.4, 0.2],
+                       [0.05, 0.2]])
+line_points_side_3 = np.array([[0.05, 0.2],
+                       [0.45, 0.2],
+                       [0.05, 0.2],
+                       [0.45, 0.2],
+                       [0.05, 0.2],
+                       [0.45, 0.2],
+                       [0.05, 0.2]])
 
 # move straight then change angle and move straight
 forward_and_change = np.array([[0.15, 0.08],
@@ -19,6 +30,8 @@ forward_and_change = np.array([[0.15, 0.08],
 # straight line across middle of tank
 straight_line = np.array([[0.05, 0.125],
                          [0.5, 0.125]])
+
+
 
 
 # arc CCW then arc CW
