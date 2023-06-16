@@ -12,16 +12,16 @@ line_points_m = np.array([[0.05, 0.15],
 line_times = [0, 4, 8]
 
 #OUT AND BACK on side of tank
-line_points_side = np.array([[0.05, 0.2],
-                       [0.4, 0.2],
-                       [0.05, 0.2]])
-line_points_side_3 = np.array([[0.05, 0.2],
-                       [0.45, 0.2],
-                       [0.05, 0.2],
-                       [0.45, 0.2],
-                       [0.05, 0.2],
-                       [0.45, 0.2],
-                       [0.05, 0.2]])
+line_points_side = np.array([[0.05, 0.21],
+                       [0.4, 0.21],
+                       [0.05, 0.21]])
+line_points_side_3 = np.array([[0.05, 0.18],
+                       [0.48, 0.18],
+                       [0.05, 0.18],
+                       [0.48, 0.18],
+                       [0.05, 0.18],
+                       [0.48, 0.18],
+                       [0.05, 0.18]])
 
 # move straight then change angle and move straight
 forward_and_change = np.array([[0.15, 0.08],

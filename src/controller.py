@@ -20,7 +20,7 @@ class Controller():
 
    def __init__(self, lookahead=20, spacing=.001, plot_data=True, save_data=True,
                 total_time=30, camera_port=0, camera_bounds = np.array([[420, 365], [1340, 905]]),
-                save_video=True, transmit_port='/dev/tty.usbmodem14102'):
+                save_video=False, transmit_port='/dev/tty.usbmodem1102'):
        print("initializing controller")
        self._ser = serial.Serial(transmit_port, baudrate=115200)
        self._lookahead = lookahead
@@ -120,21 +120,24 @@ class Controller():
         ## add series saves raw data and then creates plots through data_handler.py
        self._data_handler.add_series('Desired Position', xdes, ydes,'x (m)', 'y (m)')
        self._data_handler.add_series('Actual Position', x, y,'x (m)', 'y (m)')
-    #    self._data_handler.add_series('Desired X-Pos vs. Time', self._times, xdes, 'time(s)', "x (m)")
+       self._data_handler.add_series('Desired X-Pos vs. Time', self._times, xdes, 'time(s)', "x (m)") ## need to have this line to get the correct time array for the desired position data
        self._data_handler.add_series('Actual X-Pos vs. Time', self._time_arr, x, 'time(s)', "x (m)")
 
-    #    self._data_handler.add_series('Desired Y-Pos vs. Time', self._times, ydes, 'time(s)', "y (m)")
+       self._data_handler.add_series('Desired Y-Pos vs. Time', self._times, ydes, 'time(s)', "y (m)")
        self._data_handler.add_series('Actual Y-Pos vs. Time', self._time_arr, y, 'time(s)', "y (m)")
 
-       self._data_handler.add_series('Theta vs. Time', self._time_arr, self._theta_arr, 'time(s)', 'theta')
+       self._data_handler.add_series('Theta vs. Time', self._time_arr, self._theta_arr, 'time(s)', 'theta (rads)')
        self._data_handler.add_series('Robot Velocity', self._time_arr[1:], v, 'time (s)', 'velocity (m/s)')
+       
        self._data_handler.run()
        
 
 if __name__ == '__main__':
-   bounds = np.array([[570,  311], [1442, 802]])   # find these with calibrate_setup.py
+    #LAIR: [ 687  396][1483  801]
+    #keck: [570,  311], [1442, 802]
+   bounds = np.array([[685,  394], [1481, 800]])   # find these with calibrate_setup.py
 
-   port_t = '/dev/tty.usbmodem11102'                # find this with ls /dev/tty.usb*   Change this port as needed
+   port_t = '/dev/tty.usbmodem1102'                # find this with ls /dev/tty.usb*   Change this port as needed
    port_c = 0                                      # either 0 or 1
    c = Controller(camera_bounds = bounds, camera_port = port_c, transmit_port = port_t,
                   lookahead = 10, total_time = 30)
