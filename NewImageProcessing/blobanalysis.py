@@ -207,3 +207,13 @@ plt.xlabel('xPred (pixels)')
 plt.savefig('lure_trajectory.png')
 
 plt.show()
+
+
+
+'''
+to-do:
+- compute distances, find nearest neighbor, next nearest neighbor
+
+
+
+'''
