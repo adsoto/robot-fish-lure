@@ -11,6 +11,12 @@ line_points_m = np.array([[0.05, 0.15],
                        [0.05, 0.15]])
 line_times = [0, 4, 8]
 
+along_y = np.array([[0.2, 0.08],
+                    [0.2, 0.3]])
+
+diagonal = np.array([[0.15, 0.15],
+                     [0.3, 0.3]])
+
 #OUT AND BACK on side of tank
 line_points_side = np.array([[0.05, 0.21],
                        [0.4, 0.21],
@@ -29,7 +35,7 @@ forward_and_change = np.array([[0.15, 0.08],
                               [0.5, 0.15]])
 # straight line across middle of tank
 straight_line = np.array([[0.05, 0.125],
-                         [0.5, 0.125]])
+                         [0.08, 0.125]])
 
 
 
@@ -80,6 +86,10 @@ rect_points = np.array([[.05, .08],
                        [.45, .08],
                        [.45, .25],
                        [.05, .25]])
+
+test_points = np.array([[.05, .08],
+                [.15, .08],
+                [.5, .3]])
 
 
 
