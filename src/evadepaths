@@ -1,0 +1,34 @@
+"""file defines the pathbounds of the new evasion path, also defines the fish radius
+sends different paths to controller based on the position and robot + fish"""
+
+import numpy as np
+import controller
+import convert
+# from controller import robot_pos
+tankboundspx = controller.bounds
+robot_pos = [400,300]
+
+x1 = float(tankboundspx[0][0])
+y1 = float(tankboundspx[0][1]) 
+x2 = float(tankboundspx[1][0]) 
+y2 = float(tankboundspx[1][1]) 
+
+# CONVERT TO MET TO MATCH PATHS AND robot_pos
+x1_met = convert.xpxtomet(x1)
+y1_met = convert.ypxtomet(y1)
+x2_met = convert.xpxtomet(x2)
+y2_met = convert.ypxtomet(y2)
+
+height_met = abs(y2_met - y1_met) # 13in ish - good
+width_met= abs(x2_met - x1_met)  # 27.25in ish - good
+
+#REASSIGN ORIGIN to lower left corner of cropped frame
+x1_met = 0 # sets left wallto be x = 0
+y1_met = height_met
+x2_met = width_met
+y2_met = 0 #set the bottom to be y = 0
+newbounds = np.array([[x1_met, y1_met], [x2_met, y2_met]])
+print(newbounds)
+print(robot_pos)
+
+

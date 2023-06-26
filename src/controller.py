@@ -15,6 +15,12 @@ import matplotlib.pyplot as plt
 import video_processor as vp
 import orange as orange
 
+
+global bounds # find these with calibrate_setup.py
+#LAIR: [ 687  396][1483  801]
+#keck: [570,  311], [1442, 802]
+bounds = np.array([[685,  394], [1481, 800]])   #CHANGE THESE! THESE ARE TANK BOUNDS
+
 class Controller():
    """Top-level class to run the robotic fish"""
    def __init__(self, lookahead=20, spacing=.001, plot_data=True, save_data=True,
@@ -76,6 +82,7 @@ class Controller():
 
            fish_vect = head - tail
            theta = np.arctan2(fish_vect[1], fish_vect[0])
+           global robot_pos
            robot_pos = (head + tail)/2
 
            print("position ",robot_pos) # debugging in meters
@@ -129,13 +136,12 @@ class Controller():
        self._data_handler.run()
        
 if __name__ == '__main__':
-    #LAIR: [ 687  396][1483  801]
-    #keck: [570,  311], [1442, 802]
-   bounds = np.array([[685,  394], [1481, 800]])   # find these with calibrate_setup.py
+  
 
-   port_t = '/dev/tty.usbmodem14102'                # find this with ls /dev/tty.usb*   Change this port as needed
-   port_c = 0                                      # either 0 or 1
-   c = Controller(camera_bounds = bounds, camera_port = port_c, transmit_port = port_t,
-                  lookahead = 10, total_time = 10)
-   c.run()
-   c.end()
+    port_t = '/dev/tty.usbmodem14102'                # find this with ls /dev/tty.usb*   Change this port as needed
+    port_c = 0                                      # either 0 or 1
+    c = Controller(camera_bounds = bounds, camera_port = port_c, transmit_port = port_t,
+                    lookahead = 10, total_time = 10)
+    c.run()
+    c.end()
+
