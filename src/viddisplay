@@ -25,7 +25,8 @@ def click_event(event, x, y, flags, params):
       print(f'({x},{y})') # when clicked image, display pixels
     
 while(True):
-    camera_bounds = np.array([[467, 382], [1290, 862]]) # find these with calibrate_setup.py
+    camera_bounds = np.array([[685,  394], [1481, 800]])   #CHANGE THESE! THESE ARE TANK BOUNDS
+
 
     ret, frame = video.read()
     frame = cv2.undistort(frame, MTX, DIST, None, MTX)

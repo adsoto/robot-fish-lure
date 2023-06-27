@@ -129,7 +129,7 @@ class VideoProcessor:
         if self._current_frame is not None:
 
             if pathinmeters == True: #converts a meter path to px for graping
-                xtarget_px = self.xmettopx(target[0]+0.02)  # correction for the center of the robot versus the front of the robot (display purposes only)
+                xtarget_px = self.xmettopx(target[0])  # correction for the center of the robot versus the front of the robot (display purposes only)
                 ytarget_px = self.ymettopx(target[1])
                 cv2.circle(self._current_frame, (int(xtarget_px), int(ytarget_px)), 5, (0, 159, 22), -1)
                 # green dot for target path

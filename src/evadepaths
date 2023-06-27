@@ -1,34 +1,73 @@
 """file defines the pathbounds of the new evasion path, also defines the fish radius
 sends different paths to controller based on the position and robot + fish"""
-
+import math
+import random
 import numpy as np
 import controller
 import convert
+import math
+
 # from controller import robot_pos
+
+def createbounds(bounds):
+    # CONVERT TO MET TO MATCH PATHS AND robot_pos
+    x1_met = convert.xpxtomet(float(bounds[0][0]))
+    y1_met = convert.ypxtomet(float(bounds[0][1]))
+    x2_met = convert.xpxtomet(float(bounds[1][0]))
+    y2_met = convert.ypxtomet(float(bounds[1][1]))
+    return x1_met, y1_met, x2_met, y2_met
+
+def createcorners(x1_met,y1_met,x2_met,y2_met): # PASS METER VALUES HERE
+    """creates corners of the tank for the robot to search in -- reassigns origin to lower left corner, matching robot position in meters"""
+
+    height_met = abs(y2_met - y1_met) # 13in ish - good
+    width_met= abs(x2_met - x1_met)  # 27.25in ish - good
+    x1_met = 0 # sets left wall to be x = 0
+    y1_met = height_met
+    x2_met = width_met
+    y2_met = 0 #set the bottom to be y = 0
+    listcorners = [[0,0], [0,y1_met], [x2_met,y1_met], [x2_met,0]]
+    return listcorners #in meters!!!
+
+def cornerdist(robot_pos, listofcorners):
+    distlist = []
+    mindist = 10000 #arbitrary
+    for i in listofcorners:
+        dist = [i,math.dist(robot_pos, i)]
+        distlist += [dist]
+    return distlist
+
 tankboundspx = controller.bounds
-robot_pos = [400,300]
+robot_pos = (0,1) ##EVENTUALLY IMPORT FROM CONTROLLER
 
-x1 = float(tankboundspx[0][0])
-y1 = float(tankboundspx[0][1]) 
-x2 = float(tankboundspx[1][0]) 
-y2 = float(tankboundspx[1][1]) 
+x1_met, y1_met, x2_met, y2_met = createbounds(tankboundspx)
+listcorners = createcorners(x1_met, y1_met, x2_met, y2_met)
+distlist = cornerdist(robot_pos, listcorners)
 
-# CONVERT TO MET TO MATCH PATHS AND robot_pos
-x1_met = convert.xpxtomet(x1)
-y1_met = convert.ypxtomet(y1)
-x2_met = convert.xpxtomet(x2)
-y2_met = convert.ypxtomet(y2)
+for x in listcorners:
+    if x[1] == min(x[0] for x in listcorners):
+        print("the closest corner is corner", x[1], "at a distance of", x[0])
 
-height_met = abs(y2_met - y1_met) # 13in ish - good
-width_met= abs(x2_met - x1_met)  # 27.25in ish - good
+print()
+print(listcorners)
 
-#REASSIGN ORIGIN to lower left corner of cropped frame
-x1_met = 0 # sets left wallto be x = 0
-y1_met = height_met
-x2_met = width_met
-y2_met = 0 #set the bottom to be y = 0
-newbounds = np.array([[x1_met, y1_met], [x2_met, y2_met]])
-print(newbounds)
-print(robot_pos)
+# newpathbounds = np.array([[x1_met, y1_met], [x2_met, y2_met]])
+# print(newpathbounds)
+
+# for i in range(5):
+#     fish_pos = [random.randint(0,10), random.randint(0,10)]
+#     robot_pos = [random.randint(0,10), random.randint(0,10)]
+    
+#     print("robot position is", robot_pos)
+#     print("fish position is", fish_pos)
+#     dist = math.dist(robot_pos,fish_pos)
+
+#     if dist < 7:
+#         print("switch to other path")
+#     else:
+#         print("no fish in range")
+#     print()
+
+
 
 
