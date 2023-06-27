@@ -3,7 +3,7 @@ sends different paths to controller based on the position and robot + fish"""
 import math
 import random
 import numpy as np
-import controller
+# import controller
 import convert
 import math
 
@@ -37,7 +37,10 @@ def cornerdist(robot_pos, listofcorners):
         distlist += [dist]
     return distlist
 
-tankboundspx = controller.bounds
+# tankboundspx = controller.bounds
+bounds = ([[ 687 ,396],[1483 ,801]])
+tankboundspx = bounds
+
 robot_pos = (0,1) ##EVENTUALLY IMPORT FROM CONTROLLER
 
 x1_met, y1_met, x2_met, y2_met = createbounds(tankboundspx)

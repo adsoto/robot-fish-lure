@@ -15,18 +15,21 @@ import matplotlib.pyplot as plt
 import video_processor as vp
 import orange as orange
 
+global setup
+setup = "KECK"
 
 global bounds # find these with calibrate_setup.py
 #LAIR: [ 687  396][1483  801]
-#keck: [570,  311], [1442, 802]
-bounds = np.array([[685,  394], [1481, 800]])   #CHANGE THESE! THESE ARE TANK BOUNDS
+#keck: [595,  331], [1425, 801]
+
+bounds = np.array([[595,  331], [1425, 801]])   #CHANGE THESE! THESE ARE TANK BOUNDS
 
 class Controller():
    """Top-level class to run the robotic fish"""
    def __init__(self, lookahead=20, spacing=.001, plot_data=True, save_data=True,
                 total_time=30, camera_port=0, camera_bounds = np.array([[420, 365], [1340, 905]]),
                 save_video=False, transmit_port='/dev/tty.usbmodem14102'):
-       print("initializing controller")
+       print("initializing controller for ", setup, "setup")
        self._ser = serial.Serial(transmit_port, baudrate=115200)
        self._lookahead = lookahead
        self._data_handler = dh.DataHandler(plot_data, save_data)
@@ -39,7 +42,6 @@ class Controller():
    def _make_path(self, spacing, total_time):
        """Interpolates points to construct a continuous path for the bot to follow"""
        global inmeters
-
        points = straight_line # change the robot path here
        inmeters = True  # change this when path changes --> is the path in meters? if yes--> true 
 
@@ -79,7 +81,7 @@ class Controller():
            pathinmeters = inmeters
 
            [head, tail] = self._video.get_coords(2)
-
+           print([head, tail])
            fish_vect = head - tail
            theta = np.arctan2(fish_vect[1], fish_vect[0])
            global robot_pos
@@ -133,15 +135,14 @@ class Controller():
        self._data_handler.add_series('Theta vs. Time', self._time_arr, self._theta_arr, 'time(s)', 'theta (rads)')
        self._data_handler.add_series('Robot Velocity', self._time_arr[1:], v, 'time (s)', 'velocity (m/s)')
        
-       self._data_handler.run()
+    #    self._data_handler.run()
        
 if __name__ == '__main__':
-  
-
-    port_t = '/dev/tty.usbmodem14102'                # find this with ls /dev/tty.usb*   Change this port as needed
-    port_c = 0                                      # either 0 or 1
+    port_t = '/dev/tty.usbmodem14102'        # find this with ls /dev/tty.usb*   Change this port as needed
+    port_c = 0                               # either 0 or 1
     c = Controller(camera_bounds = bounds, camera_port = port_c, transmit_port = port_t,
                     lookahead = 10, total_time = 10)
     c.run()
     c.end()
 
+      

@@ -25,9 +25,10 @@ def click_event(event, x, y, flags, params):
       print(f'({x},{y})') # when clicked image, display pixels
     
 while(True):
-    camera_bounds = np.array([[685,  394], [1481, 800]])   #CHANGE THESE! THESE ARE TANK BOUNDS
 
-
+    #keck: [570,  311], [1442, 802]
+    # lair [685,  394], [1481, 800]
+    camera_bounds = np.array([[570,  311], [1442, 802]])   #CHANGE THESE! THESE ARE TANK BOUNDS
     ret, frame = video.read()
     frame = cv2.undistort(frame, MTX, DIST, None, MTX)
     frame = frame[camera_bounds[0][1]:camera_bounds[1][1], camera_bounds[0][0]:camera_bounds[1][0]]

@@ -2,7 +2,8 @@ import numpy as np
 import cv2
 import os
 from datetime import datetime
-import controller
+from controller import setup
+import convert
 
 #X DIR CONVERSTIONS
 xoff = 574
@@ -55,26 +56,6 @@ class VideoProcessor:
             
             self._out = cv2.VideoWriter(video_filename, cv2.VideoWriter_fourcc(*'MJPG'), FPS, (size[0][0],size[0][1]))
 
-    def xpxtomet(self, xpix):
-        xadjust = xpix - xoff  # accounts for offset in px - origin on the left side of the tank
-        x_met = ((xadjust/xslope) + 0.49) # adjust origin to lower left IN METERS
-        return x_met
-
-    def ypxtomet(self,ypix):
-        yadjust = ypix - yoff # accounts for offset in px and moves origin to lower left corner or tank
-        y_met = ((yadjust/yslope) - 0.3)  # adjust  origin to lower left IN METERS
-        return y_met
-
-    def ymettopx(self,ymet):
-        y_px = (ymet+0.3) * yslope
-        yadjust = y_px + yoff
-        return yadjust
-
-    def xmettopx(self, xmet):
-        x_px = (xmet -0.49) * xslope
-        xadjust = x_px + xoff
-        return xadjust
-
     def get_coords(self, num_objects):
         """Finds the n largest dark objects and returns their centroids in order"""
 
@@ -113,8 +94,8 @@ class VideoProcessor:
             if M["m00"] != 0:
                 cX_px = int(M["m10"] / M["m00"]) #in pixels
                 cY_px = int(M["m01"] / M["m00"]) #in pixels
-                cX_met = self.xpxtomet(cX_px) #in meters
-                cY_met = self.ypxtomet(cY_px) #in meters
+                cX_met = convert.xpxtomet(cX_px) #in meters
+                cY_met = convert.ypxtomet(cY_px) #in meters
 
             else: cX_px, cY_px = 0, 0 #pixels
 
@@ -129,15 +110,23 @@ class VideoProcessor:
         if self._current_frame is not None:
 
             if pathinmeters == True: #converts a meter path to px for graping
-                xtarget_px = self.xmettopx(target[0])  # correction for the center of the robot versus the front of the robot (display purposes only)
-                ytarget_px = self.ymettopx(target[1])
-                cv2.circle(self._current_frame, (int(xtarget_px), int(ytarget_px)), 5, (0, 159, 22), -1)
-                # green dot for target path
-                print("meters path")
+                xtarget_px = convert.xmettopx(target[0]) 
+                ytarget_px = convert.ymettopx(target[1])
+                frameheight = int(self._bounds[1][1] - self._bounds[0][1])
+              
+                if setup =="LAIR":
+                    cv2.circle(self._current_frame, (int(xtarget_px), int(ytarget_px)), 5, (0, 159, 22), -1)
+                    # green dot for target path
+                    print("meters path")
+
+                if setup =="KECK":
+                    cv2.circle(self._current_frame, (int(xtarget_px), int(ytarget_px -160 )), 5, (0, 159, 22), -1)
+                    # green dot for target path
+                    print("meters path")
 
             if pathinmeters == False:  #graphs target in px
-                xtarget_met = self.xpxtomet(target[0]) #path target in meters
-                ytarget_met = self.ypxtomet(target[1]) #path target in meters
+                xtarget_met = convert.xpxtomet(target[0]) #path target in meters
+                ytarget_met = convert.ypxtomet(target[1]) #path target in meters
                 cv2.circle(self._current_frame, (int(target[0]/PIX2METERS), int(self._height-target[1]/PIX2METERS)), 5, (0, 159, 22), -1)
                 #green dot for target path    
                 print("pixels path")    
