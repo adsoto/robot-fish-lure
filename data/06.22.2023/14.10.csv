@@ -1,0 +1,8 @@
+Desired Position: x (m),Desired Position: y (m),Actual Position: x (m),Actual Position: y (m),Desired X-Pos vs. Time: time(s),Desired X-Pos vs. Time: x (m),Actual X-Pos vs. Time: time(s),Actual X-Pos vs. Time: x (m),Desired Y-Pos vs. Time: time(s),Desired Y-Pos vs. Time: y (m),Actual Y-Pos vs. Time: time(s),Actual Y-Pos vs. Time: y (m),Theta vs. Time: time(s),Theta vs. Time: theta (rads),Robot Velocity: time (s),Robot Velocity: velocity (m/s),Position: x (m)1,Position: y (m)1,Position: x (m)2,Position: y (m)2,X-Pos vs. Time: time(s)1,X-Pos vs. Time: x (m)1,X-Pos vs. Time: time(s)2,X-Pos vs. Time: x (m)2,Y-Pos vs. Time: time(s)1,Y-Pos vs. Time: y (m)1,Y-Pos vs. Time: time(s)2,Y-Pos vs. Time: y (m)2
+0.15,0.125,,,1.0,0.15,,,1.0,0.125,,,,,,,0.15,0.125,,,1.0,0.15,,,1.0,0.125,,
+0.16,0.125,,,2.0,0.16,,,2.0,0.125,,,,,,,0.16,0.125,,,2.0,0.16,,,2.0,0.125,,
+0.17,0.125,,,3.0,0.17,,,3.0,0.125,,,,,,,0.17,0.125,,,3.0,0.17,,,3.0,0.125,,
+0.18,0.125,,,4.0,0.18,,,4.0,0.125,,,,,,,0.18,0.125,,,4.0,0.18,,,4.0,0.125,,
+0.19,0.125,,,5.0,0.19,,,5.0,0.125,,,,,,,0.19,0.125,,,5.0,0.19,,,5.0,0.125,,
+0.2,0.125,,,6.0,0.2,,,6.0,0.125,,,,,,,0.2,0.125,,,6.0,0.2,,,6.0,0.125,,
+0.21,0.125,,,7.0,0.21,,,7.0,0.125,,,,,,,0.21,0.125,,,7.0,0.21,,,7.0,0.125,,
