@@ -20,7 +20,7 @@ class Controller():
    """Top-level class to run the robotic fish"""
 
    def __init__(self, lookahead=20, spacing=.001, plot_data=True, save_data=True, camera_port=0, camera_bounds = np.array([[420, 365], [1340, 905]]),
-                save_video=False, transmit_port='/dev/tty.usbmodem1402'):
+                save_video=True, transmit_port='/dev/tty.usbmodem1402'):
        print("initializing controller")
        self._ser = serial.Serial(transmit_port, baudrate=115200)
        self._lookahead = lookahead
@@ -39,7 +39,7 @@ class Controller():
 
    def find_target(self, trajectory, currentTime):
        """Finds the next target in the path for the bot to track"""
-       dt = 0.05
+       dt = 0.08 # 0.08 
        [head, tail] = self._video.get_coords(2)
        fish_vect = head - tail
        theta = np.arctan2(fish_vect[1], fish_vect[0])
@@ -56,15 +56,14 @@ class Controller():
                pos2 = [trajectory[i][1], trajectory[i][2]]
                distancevector = np.subtract(pos2, pos1) 
                target = pos1 + percentTime*distancevector
-               #if target[0]>final_pos[0]: #there needs to be a better check for this, will only work for forward line 
-                   #target = final_pos
+               
 
-               #print(t1, t2, ttrack)
            elif ttrack > trajectory[len(trajectory)-1][0]:
                target = [trajectory[len(trajectory)-1][1], trajectory[len(trajectory)-1][2]]
-       
+           theta_des = trajectory[i][3]
             # else case for if robot trajectory time is greater than ttrack - holly
-       return target
+       return target, theta_des
+   
 
    def run(self):
        """Runs the bot"""
@@ -85,9 +84,11 @@ class Controller():
            robot_pos = (head + tail)/2
            currentTime = time.time() - start_time
 
-           target1 = self.find_target(trajectory, currentTime)
+           target1, theta_des1 = self.find_target(trajectory, currentTime)
            
-           [vRight, vLeft] = track_point(robot_pos, target1, theta, 0) # note theta_des = 0
+           ### conditional statement: if robot is within radius of a waypoint, call turn_near_wypt function
+           ### else if robot is not near waypoint, call track_point which makes robot move straight
+           [vRight, vLeft] = track_point(robot_pos, target1, theta, theta_des1) 
           
            #targetIndex = self.find_target(currentTime)
            #print(targetIndex) ###
@@ -101,9 +102,9 @@ class Controller():
                start_time = time.time() # reset start time
            self._video.display(target1)
 
-           print('time:', currentTime)
-           print('target:', target1) 
-           print('pos:', robot_pos)
+           #print('time:', currentTime)
+           #print('target:', target1) 
+           #print('pos:', robot_pos)
 
 
   
@@ -154,7 +155,8 @@ if __name__ == '__main__':
     #LAIR: [ 687  396][1483  801]
     #keck: [570,  311], [1442, 802]
     # keck camera 2: [[ 699    9], [1204  892]]
-   bounds = np.array([[570,  311], [1442, 802]])   # find these with calibrate_setup.py
+    # lair with tall robot: [[ 603  361], [1436  773]]
+   bounds = np.array([[603,  361], [1436, 773]])   # find these with calibrate_setup.py
 
    port_t = '/dev/tty.usbmodem1402'                # find this with ls /dev/tty.usb*   Change this port as needed
    port_c = 0                                      # either 0 or 1
