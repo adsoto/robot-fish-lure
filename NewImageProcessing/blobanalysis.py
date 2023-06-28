@@ -22,9 +22,7 @@ fishContourIndex = 0
 lureContourIndex = 0
 bg_model = cv2.createBackgroundSubtractorKNN(history = 800, dist2Threshold = 255.0, detectShadows = True) 
 
-
 foregroundPath = r"C:\Users\ginar\Documents\robot-fish-lure\videos\orange + black.mp4"
-
 
 foregroundCapture = cv2.VideoCapture(foregroundPath)
 ret, frame_init_ = foregroundCapture.read()
@@ -66,72 +64,6 @@ while True:
         sorted_lure_contours = sorted(lure_contours, key = cv2.contourArea, reverse = True)
 
         ############# TRACK FISH W/ HSV ###############
-
-
-        resultimage = np.zeros((800, 800))
-        contrasted = cv2.normalize(frame, resultimage, -32, 255, cv2.NORM_MINMAX)
-        fish_hsv = cv2.cvtColor(contrasted,cv2.COLOR_BGR2HSV)
-        
-
-        #fish_lower = np.array([40, 70, 40], np.uint8)
-        fish_lower = np.array([0,60,0], dtype = "uint8")
-        fish_upper = np.array([24, 255, 145], dtype = "uint8")
-        
-        fish_mask = cv2.inRange(fish_hsv, fish_lower, fish_upper) # filters out black dots
-        
-       
-        fish_mask_closing = cv2.morphologyEx(fish_mask, cv2.MORPH_CLOSE, kernelclosed)
-        fish_mask_opening = cv2.morphologyEx(fish_mask_closing, cv2.MORPH_OPEN, kernelopen)
-
-        fish_contours, hierarchy = cv2.findContours(fish_mask_opening, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) #finds the contours in thresh_img        fish_img_contours = np.zeros(fish_erosion_again.shape) # creates empty image for contours
-        fish_threshcopy = cv2.cvtColor(fish_mask_opening, cv2.COLOR_BGR2RGB) #needs to be in RBG in order to make contours colorful
-        fishContours = cv2.drawContours(fish_threshcopy, fish_contours, -1, (0,255,0), 2) 
-        sorted_fish_contours = sorted(fish_contours, key = cv2.contourArea, reverse = True)
-
-        def displayWindows():
-            #displays original video
-            cv2.namedWindow('fgframe', cv2.WINDOW_NORMAL)
-            cv2.resizeWindow('fgframe', 400, 400)
-            
-            allContours = cv2.add(fishContours, lureContours)
-            #displays blobs
-            cv2.namedWindow('Contours', cv2.WINDOW_NORMAL)
-            cv2.resizeWindow('Contours', 400, 400)
-            cv2.imshow('Contours', allContours)
-
-        fishContourCount = len(sorted_fish_contours)
-        lureContourCount = len(sorted_lure_contours)
-        fishCoords = []
-        lureCoords = []
-
-        if fishContourIndex>=(fishContourCount-1) or lureContourIndex>=(lureContourCount-1):
-            displayWindows()
-            cv2.imshow('fgframe', frame)
-
-        if len(sorted_fish_contours):
-
-            for f in sorted_fish_contours:
-            #Fcnt = sorted_fish_contours[fishContourIndex]
-
-                if f is not None:
-
-                    ### FISH TRACKING ###
-                    FM = cv2.moments(f) # makes identity matrix of blob
-            
-                    if FM["m00"] != 0:
-                        fcX = int(FM["m10"] / FM["m00"]) #finds mass center
-                        fcY = int(FM["m01"] / FM["m00"])
-                        
-                    else:
-                        fcX, fcY = 0, 0
-
-                    Fcoords = np.array([fcX, fcY]) ## need list of these
-                    fishCoords.append([fcX, fcY])#add to array
-                    FxPos += [fcX]
-                    FyPos += [fcY]
-                    
-                    #print(fishCoords)
-                    #cv2.circle(fishContours, (fcX, fcY), 5, (255, 255, 255), -1)
 
         resultimage = np.zeros((800, 800))
         contrasted = cv2.normalize(frame, resultimage, -32, 255, cv2.NORM_MINMAX)
@@ -275,3 +207,13 @@ plt.xlabel('xPred (pixels)')
 plt.savefig('lure_trajectory.png')
 
 plt.show()
+
+
+
+'''
+to-do:
+- compute distances, find nearest neighbor, next nearest neighbor
+
+
+
+'''
