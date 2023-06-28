@@ -1,7 +1,7 @@
 # gain constants
-K_R = 1.5
-K_A = 2 #3 # 1.7 gain improves the overshoot during turns 
-K_B = 0 # desired angle tracking not implemented
+K_R = 1.8
+K_A = 2.5 #3 # 1.7 gain improves the overshoot during turns 
+K_B = -0.001 #0 # desired angle tracking not implemented
 
 # stability criteria:
 # K_R > 0, K_B < 0, K_A - K_R > 0

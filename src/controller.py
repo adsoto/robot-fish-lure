@@ -28,8 +28,10 @@ class Controller():
    """Top-level class to run the robotic fish"""
    def __init__(self, lookahead=20, spacing=.001, plot_data=True, save_data=True,
                 total_time=30, camera_port=0, camera_bounds = np.array([[420, 365], [1340, 905]]),
-                save_video=False, transmit_port='/dev/tty.usbmodem14102'):
-       print("initializing controller for ", setup, "setup")
+
+                save_video=False, transmit_port='/dev/tty.usbmodem1102'):
+       print("initializing controller")
+
        self._ser = serial.Serial(transmit_port, baudrate=115200)
        self._lookahead = lookahead
        self._data_handler = dh.DataHandler(plot_data, save_data)
@@ -124,7 +126,7 @@ class Controller():
        ## overlay plots desired and actual position over time
        self._data_handler.add_dual_series('Position', xdes, ydes, x, y, 'x (m)', 'y (m)')
        self._data_handler.add_dual_series('X-Pos vs. Time', self._times, xdes, self._time_arr, x, 'time(s)', "x (m)")
-       self._data_handler.add_dual_series('Y-Pos vs. Time', self._times, ydes, self._time_arr, y, 'time(s)', "y (m)")
+       self._data_handler.add_dual_series('Y-Pos vs. Time', self._times, ydes, self._time_arr, y, 'time(s)', "y (m)"
        
         ## add series saves raw data and then creates plots through data_handler.py
        self._data_handler.add_series('Desired Position', xdes, ydes,'x (m)', 'y (m)')
@@ -141,11 +143,15 @@ class Controller():
     #    self._data_handler.run()
        
 if __name__ == '__main__':
-    port_t = '/dev/tty.usbmodem14102'        # find this with ls /dev/tty.usb*   Change this port as needed
-    port_c = 0                               # either 0 or 1
-    c = Controller(camera_bounds = bounds, camera_port = port_c, transmit_port = port_t,
-                    lookahead = 10, total_time = 10)
-    c.run()
-    c.end()
 
-      
+    #LAIR: [ 687  396][1483  801]
+    #keck: [570,  311], [1442, 802]
+   bounds = np.array([[685,  394], [1481, 800]])   # find these with calibrate_setup.py
+
+   port_t = '/dev/tty.usbmodem1102'                # find this with ls /dev/tty.usb*   Change this port as needed
+   port_c = 0                                      # either 0 or 1
+   c = Controller(camera_bounds = bounds, camera_port = port_c, transmit_port = port_t,
+                  lookahead = 10, total_time = 30)
+   c.run()
+   c.end()
+

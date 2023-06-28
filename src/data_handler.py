@@ -90,12 +90,21 @@ class DataHandler():
         
         data = {}
         for name, series in self._data.items():
-            data[name + '_ind'] = series._ind
-            data[name + '_dep'] = series._dep
+            data[name + ': ' + series._xlabel] = series._ind
+            data[name + ': ' + series._ylabel] = series._dep
+
+        for name, series in self._dualdata.items():
+            data[name + ': ' + series[4] + '1'] = series[0]     
+            data[name + ': ' + series[5] + '1'] = series[1]
+            data[name + ': ' + series[4] + '2'] = series[2]
+            data[name + ': ' + series[5] + '2'] = series[3]
+            
 
         df = pd.DataFrame.from_dict(data, orient='index')
         df = df.transpose()
         df.to_csv(data_filename, index=False)
+
+
     """
     ## holly added to save data in the add_dual_series format
     def save_data_dual(self):
