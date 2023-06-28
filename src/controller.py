@@ -75,6 +75,7 @@ class Controller():
        """Runs the bot"""
        start_time = time.time()
        targetIndex = self._lookahead
+       # make corners here?!?
 
        while targetIndex < len(self._path):
            
@@ -86,6 +87,8 @@ class Controller():
            theta = np.arctan2(fish_vect[1], fish_vect[0])
            global robot_pos
            robot_pos = (head + tail)/2
+
+           #evasion path stuff
 
            print("position ",robot_pos) # debugging in meters
 
