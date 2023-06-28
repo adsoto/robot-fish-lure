@@ -5,6 +5,15 @@ Modified to change the filename and extension."""
 
 import cv2
 from datetime import *
+import numpy as np
+
+# MTX and DIST are properties of the camera (have to do with fisheye lens)
+MTX = np.array([[1.05663779e+03, 0.00000000e+00, 9.73055094e+02],
+ [0.00000000e+00, 1.05269643e+03, 5.64799418e+02],
+ [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]])
+DIST = np.array([-3.80359934e-01,  1.49531854e-01,  2.50649988e-05,  8.39488578e-05,  -2.83529982e-02])
+
+
 
 video = cv2.VideoCapture(0)
 
@@ -30,7 +39,10 @@ result = cv2.VideoWriter(filename +".avi",cv2.VideoWriter_fourcc(*'MJPG'), 30, s
 	
 while(True):
 	ret, frame = video.read()
+	frame = cv2.undistort(frame, MTX, DIST, None, MTX)
 
+
+	
 	if ret == True:
 
 		result.write(frame)

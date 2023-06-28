@@ -356,6 +356,7 @@ forward_and_change = np.array([[0.15, 0.08],
                               [0.3, 0.08],
                               [0.5, 0.15]])
 # straight line across middle of tank
+
 straight_line = np.array([[0.15, 0.125],
                          [0.16, 0.125],
                          [0.17, 0.125],
@@ -587,8 +588,6 @@ straight_line_times4 = [
 7.54983443527075 ,
 7.648529270389178 ,
 7.745966692414834]
-
-
 
 
 # arc CCW then arc CW
