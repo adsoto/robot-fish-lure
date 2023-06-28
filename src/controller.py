@@ -15,23 +15,13 @@ import matplotlib.pyplot as plt
 import video_processor as vp
 import orange as orange
 
-global setup
-setup = "KECK"
-
-global bounds # find these with calibrate_setup.py
-#LAIR: [ 687  396][1483  801]
-#keck: [595,  331], [1425, 801]
-
-bounds = np.array([[595,  331], [1425, 801]])   #CHANGE THESE! THESE ARE TANK BOUNDS
-
 class Controller():
    """Top-level class to run the robotic fish"""
+
    def __init__(self, lookahead=20, spacing=.001, plot_data=True, save_data=True,
                 total_time=30, camera_port=0, camera_bounds = np.array([[420, 365], [1340, 905]]),
-
                 save_video=False, transmit_port='/dev/tty.usbmodem1102'):
        print("initializing controller")
-
        self._ser = serial.Serial(transmit_port, baudrate=115200)
        self._lookahead = lookahead
        self._data_handler = dh.DataHandler(plot_data, save_data)
@@ -43,10 +33,8 @@ class Controller():
 
    def _make_path(self, spacing, total_time):
        """Interpolates points to construct a continuous path for the bot to follow"""
-       global inmeters
-       points = straight_line # change the robot path here
-       inmeters = True  # change this when path changes --> is the path in meters? if yes--> true 
-
+      
+       points = line_points_side_3 #change what path the robot follows from paths.py file here
        lengths = []
        for i in range(0, len(points)-1):
            lengths.append(int(np.linalg.norm(points[i+1]-points[i])/spacing)) ##the spacing constant scales the lengths.
@@ -68,6 +56,7 @@ class Controller():
 
    def find_target(self, currentTime):
        """Finds the next target in the path for the bot to track"""
+
        timeDists = [abs(time-currentTime) for time in self._times]
        timeDistance = min(timeDists)
        closest = timeDists.index(timeDistance)
@@ -77,27 +66,22 @@ class Controller():
        """Runs the bot"""
        start_time = time.time()
        targetIndex = self._lookahead
-       # make corners here?!?
+
 
        while targetIndex < len(self._path):
-           
-           pathinmeters = inmeters
-
            [head, tail] = self._video.get_coords(2)
-           print([head, tail])
            fish_vect = head - tail
            theta = np.arctan2(fish_vect[1], fish_vect[0])
-           global robot_pos
            robot_pos = (head + tail)/2
-
-           #evasion path stuff
-
-           print("position ",robot_pos) # debugging in meters
-
            currentTime = time.time() - start_time
+
+
            target = self._path[targetIndex]
            [vRight, vLeft] = track_point(robot_pos, target, theta, 0) # note theta_des = 0
+          
            targetIndex = self.find_target(currentTime)
+
+
            if self._video._go:
                self._time_arr.append(currentTime)
                self._robot_arr.append(robot_pos)
@@ -105,13 +89,17 @@ class Controller():
                self.send_commands(vRight, vLeft) # go as usual
            else:
                start_time = time.time() # reset start time
-           self._video.display(target, pathinmeters)
+           self._video.display(target)
   
    def end(self):
        """Closes the serial port, video player, etc. and saves data"""
+
+
        for i in range(50): self.send_commands(0, 0) # sending commands is unreliable, hence the 50x
        self._ser.close()
        self._video.cleanup()
+
+
        x = [pos[0] for pos in self._robot_arr]
        y = [pos[1] for pos in self._robot_arr]
        v = np.linalg.norm(np.diff(np.array([x, y])), axis=0)/np.diff(self._time_arr) #what does this do?
@@ -123,10 +111,11 @@ class Controller():
        #self._data_handler.add_series('robot position', x, y, 'x position', 'y position')
        # emily commented these out
 
+
        ## overlay plots desired and actual position over time
        self._data_handler.add_dual_series('Position', xdes, ydes, x, y, 'x (m)', 'y (m)')
        self._data_handler.add_dual_series('X-Pos vs. Time', self._times, xdes, self._time_arr, x, 'time(s)', "x (m)")
-       self._data_handler.add_dual_series('Y-Pos vs. Time', self._times, ydes, self._time_arr, y, 'time(s)', "y (m)"
+       self._data_handler.add_dual_series('Y-Pos vs. Time', self._times, ydes, self._time_arr, y, 'time(s)', "y (m)")
        
         ## add series saves raw data and then creates plots through data_handler.py
        self._data_handler.add_series('Desired Position', xdes, ydes,'x (m)', 'y (m)')
@@ -140,10 +129,10 @@ class Controller():
        self._data_handler.add_series('Theta vs. Time', self._time_arr, self._theta_arr, 'time(s)', 'theta (rads)')
        self._data_handler.add_series('Robot Velocity', self._time_arr[1:], v, 'time (s)', 'velocity (m/s)')
        
-    #    self._data_handler.run()
+       self._data_handler.run()
        
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     #LAIR: [ 687  396][1483  801]
     #keck: [570,  311], [1442, 802]
    bounds = np.array([[685,  394], [1481, 800]])   # find these with calibrate_setup.py
@@ -154,4 +143,3 @@ if __name__ == '__main__':
                   lookahead = 10, total_time = 30)
    c.run()
    c.end()
-
