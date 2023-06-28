@@ -249,12 +249,12 @@ class centroidTracker:
             if (distance) < minDist:
                 minDist = distance
                 closestFish = fish
-        print(closestFish)
-        cv2.circle(self._current_frame, closestFish, 10, (255, 0, 255), -1)
-        cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
-        cv2.resizeWindow('frame', 400, 400)
-        cv2.imshow("frame", self._current_frame)
-        cv2.waitKey(0)
+        return minDist
+        # cv2.circle(self._current_frame, closestFish, 10, (255, 0, 255), -1)
+        # cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
+        # cv2.resizeWindow('frame', 400, 400)
+        # cv2.imshow("frame", self._current_frame)
+        # cv2.waitKey(0)
         
 
     def displayWindows(self):
