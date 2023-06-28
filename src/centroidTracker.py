@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 import math
 from datetime import datetime
 import os
-import angelinaController
 from tracker import *
 
 PIX2METERS = .635/820 # meters/pixels conversion
@@ -19,7 +18,6 @@ MTX = np.array([[1.05663779e+03, 0.00000000e+00, 9.73055094e+02],
  [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]])
 DIST = np.array([-3.80359934e-01,  1.49531854e-01,  2.50649988e-05,  8.39488578e-05,  -2.83529982e-02])
 
-last = 0
 LxPos = []
 LyPos = []
 
@@ -236,11 +234,11 @@ class centroidTracker:
 
      
            
-    def findClosestNeighbor(self):
+    def findClosestNeighbor(self, robotPosition):
         fishCoords = self.get_fish_coords()
         #lureContours = self.get_lure_contours
         #lurePos = angelinaController.robot_pos
-        lurePos = [500,500]
+        lurePos = robotPosition
         cv2.circle(self._current_frame, lurePos, 10, (0, 0, 255), -1)
 
         #print(lurePos)
