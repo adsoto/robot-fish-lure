@@ -1,13 +1,12 @@
 """angelinas background subtraction / blob analysis"""
 import cv2
 import numpy as np
-import matplotlib as mp
-import pandas as pd
 import matplotlib.pyplot as plt
 import math
 from datetime import datetime
 import os
 from tracker import *
+import convert as c
 
 PIX2METERS = .635/820 # meters/pixels conversion
 FPS = 10
@@ -64,7 +63,8 @@ class centroidTracker:
         #frame = cv2.undistort(frame, MTX, DIST, None, MTX)
         #frame = frame[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
 
-        if (ret is None or frame is None): 
+        cv2.imshow("frame", frame)
+        if (not ret): 
             print("frame has nothing")
             exit(0)
         
@@ -223,6 +223,18 @@ class centroidTracker:
         headX, headY = head[0], head[1]
         tailX, tailY = tail[0], tail[1]
         lurePos = [((headX + tailX)/2), ((headY + tailY)/2)]
+
+        # CONVERSIONS #
+        for f in fishCoords:
+            f[0] = c.xpxtomet(int(f[0]))
+            f[1] = c.ypxtomet(int(f[1]))
+        # for l in lurePos:
+        #     l[0] = c.xpxtomet(int(l[0]))
+        #     l[1] = c.ypxtomet(int(l[1]))
+        lurePos[0] = c.xpxtomet(int(lurePos[0]))
+        lurePos[1] = c.ypxtomet(int(lurePos[1]))
+
+
         #cv2.circle(self._current_frame, lurePos, 10, (0, 0, 255), -1)
         if fishCoords is not None:
             #print(lurePos)
@@ -233,7 +245,8 @@ class centroidTracker:
                 if (distance) < minDist:
                     minDist = distance
                     closestFish = fish
-            return 
+            print(minDist)
+            return minDist
         # cv2.circle(self._current_frame, closestFish, 10, (255, 0, 255), -1)
         # cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
         # cv2.resizeWindow('frame', 400, 400)
@@ -309,10 +322,10 @@ if __name__ == '__main__':
     #cap = cv2.VideoCapture(foregroundPath)
     #ret, frame = cap.read()
     camera_bounds = np.array([[467, 382], [1290, 862]]) # find these with calibrate_setup.py
-    ct = centroidTracker(foregroundPath, camera_bounds, True)
+    ct = centroidTracker(foregroundPath, camera_bounds, False)
     while True:
         #ct.get_coords(1)
         #ct.displayWindows()
-        ct.findClosestNeighbor()
+        ct.get_lure_contours(0)
         if not ct.is_go(): break
     ct.cleanup()
