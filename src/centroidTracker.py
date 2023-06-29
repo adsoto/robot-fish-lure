@@ -72,15 +72,13 @@ class centroidTracker:
         ## Orange threshhlding for the robot to follow the orange dots
 
         lure_hsv =cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
-        lower_orange= np.array([0, 70, 90], dtype = "uint8") 
-        upper_orange= np.array([200, 255, 255], dtype = "uint8")
+        lower_orange= np.array([0, 70, 200], dtype = "uint8") 
+        upper_orange= np.array([250, 210, 255], dtype = "uint8")
     
         lure_mask=cv2.inRange(lure_hsv,lower_orange,upper_orange)
         kernellure = np.ones((10,10),np.uint8)
         orange_closing = cv2.morphologyEx(lure_mask, cv2.MORPH_CLOSE, kernellure)
         orange_dilation = cv2.dilate(orange_closing, None, 1)
-        cv2.imshow("thresh", lure_mask)
-        cv2.waitKey(0)
         return orange_dilation
 
 
@@ -235,7 +233,7 @@ class centroidTracker:
                 if (distance) < minDist:
                     minDist = distance
                     closestFish = fish
-            return minDist
+            return 
         # cv2.circle(self._current_frame, closestFish, 10, (255, 0, 255), -1)
         # cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
         # cv2.resizeWindow('frame', 400, 400)
