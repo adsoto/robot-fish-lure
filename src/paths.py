@@ -2,13 +2,12 @@ import numpy as np
 
 
 # List of potential shapes for the bot to travel.
-# Note most of these are in pixels, not meters
 
+# array parameters: (time, x, y, theta)
 
 #OUT AND BACK in middle of tank
-line_points_m = np.array([[0.05, 0.15],
-                       [0.4, 0.15],
-                       [0.05, 0.15]])
+line_points_m = np.array([[0, 0.05, 0.15, 0],
+                       [2, 0.5, 0.15, 0]])
 line_times = [0, 4, 10]
 
 trajectory2 = np.array([[0, 0.1, 0.125, 0],
@@ -18,10 +17,15 @@ trajectory2 = np.array([[0, 0.1, 0.125, 0],
                         [4, 0.4, 0.125, 0],
 ])
 
-rect_trajectory = np.array([[0, .05, .08, 0],
-                       [3, .45, .08, 0],
+rect_trajectory = np.array([[0, .05, .04, 0],
+                       [3, .45, .04, 0],
                        [5, .45, .25, 0],
                        [8, .05, .25, 0 ]])
+print(rect_trajectory)
+rect_trajectory_wide = np.array([[0, .05, .04, 0],
+                                 [3, .45, .04, 0],
+                                 [5, .45, .28, 0],
+                                 [8, .05, .28, 0 ]])
 
 trajectory3 = np.array([[0, 0.1, 0.1, 0],
                         [3, 0.2, 0.15, 0],
@@ -674,65 +678,6 @@ rect_times_s = [0, 3, x, 1.5, x, 3, x, 1.5]
 rect_angles_s = [0, np.pi/2, np.pi/2, np.pi, np.pi, np.pi, np.pi, np.pi]
 
 
-#LAWNMOWER PATTERN
-lawn_points = np.array([[100, 100],
-                       [700, 100],
-                       [700, 200],
-                       [100, 200],
-                       [100, 300],
-                       [700, 300],
-                       [700, 400],
-                       [100, 400]])
-lawn_times = [0, 6, 7, 13, 14, 20, 21, 27]
-
-
-#SMALL CIRCLE
-circle_points = np.array([[375, 198],
-                       [465, 235],
-                       [502, 325],
-                       [465, 415],
-                       [375, 452],
-                       [285, 415],
-                       [248, 325],
-                       [285, 235],
-                       [375, 198]])
-circle_times = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-
-
-spiral_points = np.array([[350,66],
-                      [480,120],
-                      [534,250],
-                      [480,380],
-                      [350,434],
-                      [220,380],
-                      [166,250],
-                      [220,120],
-                      [350,92],
-                      [462,138],
-                      [508,250],
-                      [462,362],
-                      [350,408],
-                      [238,362],
-                      [192,250],
-                      [238,138],
-                      [350,118],
-                      [443,157],
-                      [482,250],
-                      [443,343],
-                      [350,382],
-                      [257,343],
-                      [218,250],
-                      [257,157],
-                      [350,145],
-                      [425,175],
-                      [455,250],
-                      [425,325],
-                      [350,355],
-                      [275,325],
-                      [245,250],
-                      [275,175],
-                      [350,250]])
-spiral_times = range(0, len(spiral_points))
 
 
 
