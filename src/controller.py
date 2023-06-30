@@ -23,14 +23,13 @@ global bounds # find these with calibrate_setup.py
 #LAIR: [ 687  396][1483  801]
 #keck: [595,  331], [1425, 801]
 # emily 6/28 keck -- 
-bounds = np.array([[595,  331], [1425, 801]])   #CHANGE THESE! THESE ARE TANK BOUNDS
+keckBounds = np.array([[576,  326], [1444, 806]])   #KECK BOUNDS
 
 class Controller():
    """Top-level class to run the robotic fish"""
    def __init__(self, lookahead=20, spacing=.001, plot_data=True, save_data=True,
-                total_time=30, camera_port=0, camera_bounds = np.array([[420, 365], [1340, 905]]),
-
-                save_video=False, transmit_port='/dev/tty.usbmodem14202'):
+                total_time=30, camera_port=0, camera_bounds = keckBounds, save_video=False, 
+                transmit_port='/dev/tty.usbmodem14102'):
        print("initializing controller")
 
        self._ser = serial.Serial(transmit_port, baudrate=115200)
@@ -151,9 +150,9 @@ if __name__ == '__main__':
     #keck: [570,  311], [1442, 802]
 #    bounds = np.array([[685,  394], [1481, 800]])   # find these with calibrate_setup.py
 
-   port_t = '/dev/tty.usbmodem14202'                # find this with ls /dev/tty.usb*   Change this port as needed
+   port_t = '/dev/tty.usbmodem14102'                # find this with ls /dev/tty.usb*   Change this port as needed
    port_c = 0                                      # either 0 or 1
-   c = Controller(camera_bounds = bounds, camera_port = port_c, transmit_port = port_t,
+   c = Controller(camera_bounds = keckBounds, camera_port = port_c, transmit_port = port_t,
                   lookahead = 10, total_time = 30)
    c.run()
    c.end()

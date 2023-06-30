@@ -1,13 +1,12 @@
 """angelinas background subtraction / blob analysis"""
 import cv2
 import numpy as np
-import matplotlib as mp
-import pandas as pd
 import matplotlib.pyplot as plt
 import math
 from datetime import datetime
 import os
 from tracker import *
+import convert as c
 
 PIX2METERS = .635/820 # meters/pixels conversion
 FPS = 10
@@ -61,67 +60,81 @@ class centroidTracker:
     def get_lure_thresh(self):
         ret, frame = self._cap.read()
 
-        #frame = cv2.undistort(frame, MTX, DIST, None, MTX)
-        #frame = frame[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
+        self._current_frame = cv2.undistort(frame, MTX, DIST, None, MTX)
+        self._current_frame = frame[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
 
-        if (ret is None or frame is None): 
-            print("Done")
-            self._go = False
+        if (not ret): 
+            print("frame has nothing")
+            exit(0)
         
-        self._current_frame = frame.copy()
         ## Orange threshhlding for the robot to follow the orange dots
 
-        lure_hsv =cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
-        lower_orange= np.array([0, 0, 130], dtype = "uint8") 
-        upper_orange= np.array([7, 255, 255], dtype = "uint8")
+        lure_hsv =cv2.cvtColor(self._current_frame,cv2.COLOR_BGR2HSV)
+        lower_orange= np.array([0, 70, 200], dtype = "uint8") 
+        upper_orange= np.array([250, 210, 255], dtype = "uint8")
     
         lure_mask=cv2.inRange(lure_hsv,lower_orange,upper_orange)
-
-        kernellure = np.ones((15,15),np.uint8)
-        kernelopen = np.ones((5,5),np.uint8)
-
+        kernellure = np.ones((10,10),np.uint8)
         orange_closing = cv2.morphologyEx(lure_mask, cv2.MORPH_CLOSE, kernellure)
-        orange_opening = cv2.morphologyEx(orange_closing, cv2.MORPH_OPEN, kernelopen)
-        lure_threshcopy = cv2.cvtColor(orange_opening, cv2.COLOR_BGR2RGB)
-        cv2.imshow("thresh", orange_opening)
-        cv2.waitKey(0)
-        return orange_opening
+        orange_dilation = cv2.dilate(orange_closing, None, 1)
+        return orange_dilation
 
 
-    def get_lure_contours(self):
+    def get_lure_contours(self, num_objects):
         """Finds the lure and returns centroids in size order"""
         lure_thresh = self.get_lure_thresh()
 
-        #cv2.imshow("lure", lure_thresh)
+        if (lure_thresh is None):
+            print("no lure")
+            exit(0)
 
         lure_cnts = cv2.findContours(lure_thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         lure_cnts = lure_cnts[0] if len(lure_cnts) == 2 else lure_cnts[1]
-        #sorted_lure_cnts = sorted(lure_cnts, key=cv2.contourArea, reverse=True)
-        return lure_cnts
+        sorted_lure_cnts = sorted(lure_cnts, key=cv2.contourArea, reverse=True)
+
+        cv2.namedWindow('lure thresh', cv2.WINDOW_NORMAL)
+        
+        self._current_frame = cv2.undistort(self._current_frame, MTX, DIST, None, MTX)
+        self._current_frame = self._current_frame[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
+
+     
+        cv2.resizeWindow('lure thresh', 600, 600)
+        cv2.imshow('lure thresh', lure_thresh)
+
+        if num_objects == 0:
+            return sorted_lure_cnts
+        else:
+            return sorted_lure_cnts[0:num_objects]
 
 
-    def get_lure_coords(self):
-
-        cnts = self.get_lure_contours()
-        lureContourCount = len(cnts)
+    def get_lure_coords(self, numObj):
         lureCoords = []
-        if len(cnts) < lureContourCount: return lureCoords # if there aren't enough contours, return
-        for i in range(0, lureContourCount):
-            LM = cv2.moments(cnts[i])
+        cnts = self.get_lure_contours(numObj)
+        if len(cnts) == 0: return lureCoords # if there aren't enough contours, return
+        for f in cnts:
+            LM = cv2.moments(f)
             if LM["m00"] != 0:
-                cX = int(LM["m10"] / LM["m00"])
-                cY = int(LM["m01"] / LM["m00"])
-            else: cX, cY = 0, 0
-            cv2.circle(self._current_frame, (cX, cY), int(5/(i+1)), (320, 159, 22), -1)
-            lureCoords = np.array([cX, cY])
-        #lureCoords[:,1] = self._height - lureCoords[:,1] # move origin to lower left corner
-        return lureCoords#*PIX2METERS
+                lcX = int(LM["m10"] / LM["m00"])
+                lcY = int(LM["m01"] / LM["m00"])
+            else: 
+                lcX, lcY = 0, 0
+            lureCoords.append([lcX, lcY])
+            cv2.circle(self._current_frame, (lcX, lcY), 3, (320, 159, 22), -1)
+
+
+
+        return lureCoords
 
     def get_fish_thresh(self):
         ret, frame = self._cap.read()
+        # frame = frame[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
 
-        #frame = cv2.undistort(frame, MTX, DIST, None, MTX)
-        #frame = frame[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
+        # frame = cv2.undistort(frame, MTX, DIST, None, MTX)
+        # frame = frame[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
+
+
+        frame = cv2.undistort(frame, MTX, DIST, None, MTX)
+        frame = frame[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
 
         if (ret is None or frame is None): 
             print("frame has nothing")
@@ -145,7 +158,7 @@ class centroidTracker:
         fish_mask_closing = cv2.morphologyEx(fish_mask, cv2.MORPH_CLOSE, kernelclosed)
         fish_mask_opening = cv2.morphologyEx(fish_mask_closing, cv2.MORPH_OPEN, kernelopen)
         fish_threshcopy = cv2.cvtColor(fish_mask_opening, cv2.COLOR_BGR2RGB)
-        
+        cv2.imshow("fish_mask", fish_mask_opening)
         return fish_mask_opening
 
     def get_fish_contours(self):
@@ -160,7 +173,6 @@ class centroidTracker:
         sortedfishContours = sorted(fish_cnts, key=cv2.contourArea, reverse=True)
         fishContours = cv2.drawContours(self._current_frame, sortedfishContours, -1, (0,255,0), 2) 
         return sortedfishContours
-
 
     def get_fish_coords_id(self, num_objects):
         """Finds fish and returns centroids in size order"""
@@ -183,29 +195,10 @@ class centroidTracker:
         fish_boxes_ids = fishTracker.update(fishdetections) # contains fish identifications
         for box_id in fish_boxes_ids:
             x, y, w, h, id = box_id
-            
+
             cv2.putText(self._current_frame, str(id), (x, y - 15), cv2.FONT_HERSHEY_PLAIN, 1, (255, 0, 0), 2)
             cv2.rectangle(self._current_frame, (x, y), (x + w, y + h), (0, 255, 0), 3) # draws rectangle aroudn contours
             print(box_id)
-        # print("about to loop")
-        # #for i in range(0, num_objects):
-        # for f in cnts:
-        #     FM = cv2.moments(f)
-        #     if FM["m00"] != 0:
-        #         fcX = int(FM["m10"] / FM["m00"])
-        #         fcY = int(FM["m01"] / FM["m00"])
-                
-        #     else: 
-        #         fcX, fcY = 0, 0
-        #     #print(str(fcX))
-        #     #cv2.circle(self._current_frame, (fcX, fcY), 3, (320, 159, 22), -1)
-        #     fishCoords.append([fcX, fcY])
-        #     #FxPos += [fcX]
-        #     #FyPos += [fcY]
-        #     print(fishCoords)
-        print("looped")
-        #fishCoords[:,1] = self._height - fishCoords[:,1] # move origin to lower left corner
-        #print(fish_boxes_ids)
         return fish_boxes_ids
     
     def get_fish_coords(self):
@@ -219,11 +212,9 @@ class centroidTracker:
             if FM["m00"] != 0:
                 fcX = int(FM["m10"] / FM["m00"])
                 fcY = int(FM["m01"] / FM["m00"])
-                
             else: 
                 fcX, fcY = 0, 0
             #print(str(fcX))
-            #cv2.circle(self._current_frame, (fcX, fcY), 3, (320, 159, 22), -1)
             fishCoords.append([fcX, fcY])
             #FxPos += [fcX]
             #FyPos += [fcY]
@@ -232,59 +223,86 @@ class centroidTracker:
         #print(fishCoords)
         return fishCoords
 
-     
-           
-    def findClosestNeighbor(self, robotPosition):
-        fishCoords = self.get_fish_coords()
-        #lureContours = self.get_lure_contours
-        #lurePos = angelinaController.robot_pos
-        lurePos = robotPosition
-        cv2.circle(self._current_frame, lurePos, 10, (0, 0, 255), -1)
 
-        #print(lurePos)
-        closestFish = fishCoords[0]
-        minDist = math.dist(lurePos,closestFish)
-        for fish in fishCoords:
-            distance = math.dist(lurePos, fish)
-            if (distance) < minDist:
-                minDist = distance
-                closestFish = fish
-        return minDist
-        # cv2.circle(self._current_frame, closestFish, 10, (255, 0, 255), -1)
-        # cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
-        # cv2.resizeWindow('frame', 400, 400)
-        # cv2.imshow("frame", self._current_frame)
-        # cv2.waitKey(0)
+    def findClosestNeighbor(self):
+        fishCoords = self.get_fish_coords()
+
+        [head, tail] = self.get_lure_coords(2)
+        headX, headY = head[0], head[1]
+        tailX, tailY = tail[0], tail[1]
+        lurePos = [((headX + tailX)/2), ((headY + tailY)/2)]
+
+        # CONVERSIONS #
+        for f in fishCoords:
+            f[0] = c.xpxtomet(int(f[0]))
+            f[1] = c.ypxtomet(int(f[1]))
+       
+        lurePos[0] = c.xpxtomet(int(lurePos[0]))
+        lurePos[1] = c.ypxtomet(int(lurePos[1]))
+
+        cv2.circle(self._current_frame, (100, 100), 10, (0, 0, 255), -1)
+
+        if fishCoords is not None:
+            #print(lurePos)
+            closestFish = fishCoords[0]
+            minDist = math.dist(lurePos,closestFish)
+            for fish in fishCoords:
+                distance = math.dist(lurePos, fish)
+                if (distance) < minDist:
+                    minDist = distance
+                    closestFish = fish
+            closestlist = [lurePos, closestFish, minDist]
+            return closestlist
+        
+        cv2.circle(self._current_frame, (closestFish), 10, (255, 0, 255), -1)
+        cv2.circle(self._current_frame, (lurePos) , 5, (0, 159, 22), -1)
+
+        cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
+        cv2.resizeWindow('frame', 400, 400)
+
+        cv2.imshow("frame", self._current_frame)
+        cv2.waitKey(0)
         
 
     def displayWindows(self):
         #displays original video
+        closestlist = ct.findClosestNeighbor()
+
+        print("lure position", closestlist[0])
+        print("closest fish", closestlist[1])
+        print("min dist", closestlist[2])
+
         ret, frame = self._cap.read()
         self._current_frame = frame.copy()
-        if self._current_frame is not None:
-            cv2.namedWindow('fgframe', cv2.WINDOW_NORMAL)
-            #cv2.resizeWindow('fgframe', 400, 400)
-            cv2.imshow('fgframe', frame)
-            cv2.waitKey(0)
+    
+        self._current_frame = cv2.undistort(frame, MTX, DIST, None, MTX)
+        self._current_frame = frame[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
         
-        # sortedfishContours = self.get_fish_contours
-        # lureContours = self.get_lure_contours
-        # fish_thresh = self.get_fish_thresh()
+        lurex = c.xmettopx(closestlist[0][0])
+        lurey = c.ymettopx(closestlist[0][1])
 
-        # fishContours = cv2.drawContours(fish_thresh, sortedfishContours, -1, (0,255,0), 2) 
+        closestfishx = c.xmettopx(closestlist[1][0])
+        closestfishy = c.ymettopx(closestlist[1][1])
 
-        # if fishContours is not None:# or lureContours is not None:
-        #     #allContours = cv2.add(fishContours, lureContours)
-        #     #displays blobs
-        #     cv2.namedWindow('Contours', cv2.WINDOW_NORMAL)
-        #     cv2.resizeWindow('Contours', 400, 400)
-        #     cv2.imshow('Contours', fishContours)
-        # key = cv2.waitKey(0)
-        # if key & 0xFF == ord('g'):
-        #     self._go = True
-        # elif key & 0xFF == ord('q'):
-        #     self._go = False
+        print(closestfishx, closestfishy)
 
+        cv2.circle(self._current_frame, (int(lurex),int(lurey)), 7, (0, 0, 255), -1)
+        cv2.circle(self._current_frame, (int(closestfishx),int(closestfishy)), 7, (255, 0, 0), -1) ## not working, out of frame
+
+        print("lure position", closestlist[0])
+        print("closest fish", closestlist[1])
+        print("min dist", closestlist[2])
+
+
+        # cv2.circle(self._current_frame, (closestlist[1]), 3, (255, 0, 0), -1)
+
+        if self._current_frame is not None:
+            cv2.namedWindow('Camera Feed', cv2.WINDOW_NORMAL)
+            cv2.resizeWindow('Camera Feed', 600, 600)
+            cv2.imshow('Camera Feed',  self._current_frame)
+            cv2.waitKey(1)
+        
+       
     def displayPlots():
         bgforgraph = bg_model.getBackgroundImage()
         RGB_img = cv2.cvtColor(bgforgraph, cv2.COLOR_BGR2RGB)
@@ -324,11 +342,18 @@ if __name__ == '__main__':
     foregroundPath = r"C:\Users\ginar\Documents\robot-fish-lure\videos\lure moving (1) (online-video-cutter.com).mp4"
     #cap = cv2.VideoCapture(foregroundPath)
     #ret, frame = cap.read()
-    camera_bounds = np.array([[467, 382], [1290, 862]]) # find these with calibrate_setup.py
-    ct = centroidTracker(foregroundPath, camera_bounds, True)
+
+    camera_bounds = np.array([[576, 335], [1392, 801]]) # find these with calibrate_setup.py
+    ct = centroidTracker(0, camera_bounds, True)
     while True:
+        ct.displayWindows()
+        robot_pos = ct.get_lure_coords(2) #pixels
+        #print(robot_pos[0], robot_pos[1])
         #ct.get_coords(1)
         #ct.displayWindows()
-        ct.findClosestNeighbor()
+        closestlist = ct.findClosestNeighbor()
+        #closestlist = [lurePos, closestFish, minDist]
+  
         if not ct.is_go(): break
     ct.cleanup()
+

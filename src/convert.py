@@ -53,7 +53,7 @@ if sc.setup == "KECK":
 
     def ypxtomet(ypix):
         yadjust = ypix - yoff # accounts for offset in px and moves origin to lower left corner or tank
-        y_met = abs((yadjust/yslope)-0.33)  # adjust  origin to lower left IN METERS -- absolute value is used to make y direction positive, headed towards keck sink
+        y_met = abs((yadjust/yslope)+.01)  # adjust  origin to lower left IN METERS -- absolute value is used to make y direction positive, headed towards keck sink
         return y_met
 
     def ymettopx(ymet):
