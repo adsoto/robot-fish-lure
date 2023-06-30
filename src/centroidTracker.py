@@ -63,7 +63,7 @@ class centroidTracker:
         #frame = cv2.undistort(frame, MTX, DIST, None, MTX)
         #frame = frame[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
 
-        cv2.imshow("frame", frame)
+        print(self._go)
         if (not ret): 
             print("frame has nothing")
             exit(0)
@@ -119,11 +119,11 @@ class centroidTracker:
 
         #frame = cv2.undistort(frame, MTX, DIST, None, MTX)
         #frame = frame[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
-
+        
         if (ret is None or frame is None): 
             print("frame has nothing")
             exit(0)
-        
+    
         self._current_frame = frame.copy()
         ## Orange threshhlding for the robot to follow the orange dots
 
@@ -318,7 +318,7 @@ class centroidTracker:
 
 if __name__ == '__main__':
     camera_index = 0
-    foregroundPath = r"C:\Users\ginar\Documents\robot-fish-lure\videos\lureMoving.mp4"
+    foregroundPath = r"C:\Users\ginar\Documents\robot-fish-lure\videos\lurestill.mp4"
     #cap = cv2.VideoCapture(foregroundPath)
     #ret, frame = cap.read()
     camera_bounds = np.array([[467, 382], [1290, 862]]) # find these with calibrate_setup.py
@@ -326,6 +326,6 @@ if __name__ == '__main__':
     while True:
         #ct.get_coords(1)
         #ct.displayWindows()
-        ct.get_lure_contours(0)
+        ct.findClosestNeighbor()
         if not ct.is_go(): break
     ct.cleanup()
