@@ -217,13 +217,17 @@ class centroidTracker:
      
            
     def findClosestNeighbor(self):
+        ret, frame = self._cap.read()
         fishCoords = self.get_fish_coords()
 
         [head, tail] = self.get_lure_coords(2)
         headX, headY = head[0], head[1]
         tailX, tailY = tail[0], tail[1]
+        print("headX: ", headX)
         lurePos = [((headX + tailX)/2), ((headY + tailY)/2)]
-
+        #cv2.circle(frame, lurePos, 10, (0, 0, 255), -1)
+        cv2.imshow("frame", self.get_fish_thresh)
+        cv2.waitKey(0)
         # CONVERSIONS #
         for f in fishCoords:
             f[0] = c.xpxtomet(int(f[0]))
@@ -235,7 +239,7 @@ class centroidTracker:
         lurePos[1] = c.ypxtomet(int(lurePos[1]))
 
 
-        #cv2.circle(self._current_frame, lurePos, 10, (0, 0, 255), -1)
+        
         if fishCoords is not None:
             #print(lurePos)
             closestFish = fishCoords[0]
