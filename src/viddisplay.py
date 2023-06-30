@@ -31,7 +31,7 @@ while(True):
     camera_bounds = np.array([[570,  311], [1442, 802]])   #CHANGE THESE! THESE ARE TANK BOUNDS
     ret, frame = video.read()
     frame = cv2.undistort(frame, MTX, DIST, None, MTX)
-    frame = frame[camera_bounds[0][1]:camera_bounds[1][1], camera_bounds[0][0]:camera_bounds[1][0]]
+    #frame = frame[camera_bounds[0][1]:camera_bounds[1][1], camera_bounds[0][0]:camera_bounds[1][0]]
 
     if ret == True:
 

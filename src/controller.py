@@ -14,6 +14,7 @@ import data_handler as dh
 import matplotlib.pyplot as plt
 import video_processor as vp
 import orange as orange
+import evadepaths as ep
 
 global setup
 setup = "KECK"
@@ -21,7 +22,7 @@ setup = "KECK"
 global bounds # find these with calibrate_setup.py
 #LAIR: [ 687  396][1483  801]
 #keck: [595,  331], [1425, 801]
-
+# emily 6/28 keck -- 
 bounds = np.array([[595,  331], [1425, 801]])   #CHANGE THESE! THESE ARE TANK BOUNDS
 
 class Controller():
@@ -29,13 +30,14 @@ class Controller():
    def __init__(self, lookahead=20, spacing=.001, plot_data=True, save_data=True,
                 total_time=30, camera_port=0, camera_bounds = np.array([[420, 365], [1340, 905]]),
 
-                save_video=False, transmit_port='/dev/tty.usbmodem1102'):
+                save_video=False, transmit_port='/dev/tty.usbmodem14202'):
        print("initializing controller")
 
        self._ser = serial.Serial(transmit_port, baudrate=115200)
        self._lookahead = lookahead
        self._data_handler = dh.DataHandler(plot_data, save_data)
        self._video = orange.VideoProcessor(camera_port, camera_bounds, save_video)
+       self._evadePaths = ep.evadePaths(camera_port, camera_bounds, save_video)
        self._make_path(spacing, total_time)
        self._robot_arr = []
        self._time_arr = []
@@ -84,13 +86,14 @@ class Controller():
            pathinmeters = inmeters
 
            [head, tail] = self._video.get_coords(2)
-           print([head, tail])
            fish_vect = head - tail
            theta = np.arctan2(fish_vect[1], fish_vect[0])
+           
            global robot_pos
            robot_pos = (head + tail)/2
 
            #evasion path stuff
+           #ep.runevadepaths()
 
            print("position ",robot_pos) # debugging in meters
 
@@ -126,7 +129,7 @@ class Controller():
        ## overlay plots desired and actual position over time
        self._data_handler.add_dual_series('Position', xdes, ydes, x, y, 'x (m)', 'y (m)')
        self._data_handler.add_dual_series('X-Pos vs. Time', self._times, xdes, self._time_arr, x, 'time(s)', "x (m)")
-       self._data_handler.add_dual_series('Y-Pos vs. Time', self._times, ydes, self._time_arr, y, 'time(s)', "y (m)"
+       self._data_handler.add_dual_series('Y-Pos vs. Time', self._times, ydes, self._time_arr, y, 'time(s)', "y (m)")
        
         ## add series saves raw data and then creates plots through data_handler.py
        self._data_handler.add_series('Desired Position', xdes, ydes,'x (m)', 'y (m)')
@@ -146,12 +149,11 @@ if __name__ == '__main__':
 
     #LAIR: [ 687  396][1483  801]
     #keck: [570,  311], [1442, 802]
-   bounds = np.array([[685,  394], [1481, 800]])   # find these with calibrate_setup.py
+#    bounds = np.array([[685,  394], [1481, 800]])   # find these with calibrate_setup.py
 
-   port_t = '/dev/tty.usbmodem1102'                # find this with ls /dev/tty.usb*   Change this port as needed
+   port_t = '/dev/tty.usbmodem14202'                # find this with ls /dev/tty.usb*   Change this port as needed
    port_c = 0                                      # either 0 or 1
    c = Controller(camera_bounds = bounds, camera_port = port_c, transmit_port = port_t,
                   lookahead = 10, total_time = 30)
    c.run()
    c.end()
-

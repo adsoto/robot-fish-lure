@@ -2,8 +2,8 @@ import numpy as np
 import cv2
 import os
 from datetime import datetime
-from controller import setup
 import convert
+import setupcontrol as sc
 
 #X DIR CONVERSTIONS
 xoff = 574
@@ -37,7 +37,7 @@ class VideoProcessor:
         self._height = camera_bounds[1,1]-camera_bounds[0,1]
         self._go = True # not implemented
         self._current_frame = None
-        self._bounds = camera_bounds
+        self._bounds = np.array([[467, 382], [1290, 862]])
         
         if save_video == True: # not tested            
             size = np.diff(camera_bounds, axis=0)
@@ -55,6 +55,7 @@ class VideoProcessor:
                 os.makedirs(video_folder)
             
             self._out = cv2.VideoWriter(video_filename, cv2.VideoWriter_fourcc(*'MJPG'), FPS, (size[0][0],size[0][1]))
+    
 
     def get_coords(self, num_objects):
         """Finds the n largest dark objects and returns their centroids in order"""
@@ -100,8 +101,9 @@ class VideoProcessor:
             else: cX_px, cY_px = 0, 0 #pixels
 
             cv2.circle(self._current_frame, (cX_px, cY_px), int(5/(i+1)), (320, 159, 22), -1) ##orange circle -- plots circles in pixels
+            
             coords[i,:] = np.array([cX_met, cY_met]) #appends meter coords to the array "coords"
-
+            # coords[:,1] = self._height-coords[:,1]
         return coords ##IN METERS!
     
     def display(self, target, pathinmeters):
@@ -112,15 +114,18 @@ class VideoProcessor:
             if pathinmeters == True: #converts a meter path to px for graping
                 xtarget_px = convert.xmettopx(target[0]) 
                 ytarget_px = convert.ymettopx(target[1])
-                frameheight = int(self._bounds[1][1] - self._bounds[0][1])
-              
-                if setup =="LAIR":
+                height_px= (self._bounds[1,1]-self._bounds[0,1])
+                height_met = convert.ymettopx(height_px)
+
+                
+                print(xtarget_px, ytarget_px)
+                if sc.setup =="LAIR":
                     cv2.circle(self._current_frame, (int(xtarget_px), int(ytarget_px)), 5, (0, 159, 22), -1)
                     # green dot for target path
                     print("meters path")
 
-                if setup =="KECK":
-                    cv2.circle(self._current_frame, (int(xtarget_px), int(ytarget_px -160 )), 5, (0, 159, 22), -1)
+                if sc.setup =="KECK":
+                    cv2.circle(self._current_frame, (int(xtarget_px), int(ytarget_px-(1/2)*height_met)), 5, (0, 159, 22), -1)
                     # green dot for target path
                     print("meters path")
 
@@ -133,7 +138,7 @@ class VideoProcessor:
 
             cv2.namedWindow("output", cv2.WINDOW_NORMAL)
             resized = cv2.resize(self._current_frame, (960, 540))
-            cv2.imshow('frame', resized)
+            cv2.imshow('frame', self._current_frame)
             key = cv2.waitKey(1)
             if key & 0xFF == ord('g'):
                 self._go = True
@@ -151,7 +156,6 @@ class VideoProcessor:
     
 if __name__ == '__main__':
     camera_index = 0
-    
     camera_bounds = np.array([[467, 382], [1290, 862]]) # find these with calibrate_setup.py
     vp = VideoProcessor(camera_index, camera_bounds, True)
     while True:
