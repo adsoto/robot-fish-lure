@@ -21,14 +21,6 @@ def straight_wypt(dist, vel, start_time, start_pos, theta_dir): # theta_dir is t
         print(wypts)
         ### !! How do i return this in an array of arrays when array sizes cannot be changed??
         #wypts[i] = [new_time, new_x, new_y, theta_dir]
-    
-
-    # new_x = round(start_pos[0]+dist*np.cos(theta_dir), 4)
-    # new_y = round(start_pos[1]+dist*np.sin(theta_dir),4)
-    # new_time = start_time+dist/vel
-    # new_theta = round(theta_dir, 4) # idk if des_theta in the trajectory actually does anything
-    # new_wypt = np.array([new_time, new_x, new_y, new_theta])
-    
     start_pos = [new_x, new_y]
     start_time = total_time
     # returns a waypoint and the start_pos and start_time required as input for a following waypoint
@@ -40,11 +32,7 @@ wp1, start_time1, start_pos1, start_theta1 = straight_wypt(1, 0.2, start_time, s
 # wp2 = straight_wypt(1, 0.2, start_time1, start_pos1, start_theta1)[0]
 # print(wp2)
 
-
-
 # waypoint format: [time, x, y, theta]
-
-
 
 def turn(radians, angular_vel, start_time, start_pos, current_theta):
     """turns the robot by _ radians at __ angular_velocity"""
@@ -55,7 +43,6 @@ def turn(radians, angular_vel, start_time, start_pos, current_theta):
     d_theta = dt*angular_vel
     print(num_pts)
     final_theta = np.mod(radians,np.pi*2)
-
     new_start_time = start_time+total_t
 
     wypts = np.empty([])
@@ -66,12 +53,11 @@ def turn(radians, angular_vel, start_time, start_pos, current_theta):
 
         # for CCW roatation (+ radians)
 
-        new_theta = current_theta + (radians)*(i/num_pts)
+        new_theta = current_theta + i*d_theta #(radians)*(i/num_pts)
         
         # angle wrapping
         if new_theta > np.pi:
             new_theta = -np.pi*2 + new_theta
-
         elif new_theta < -np.pi:
             new_theta = new_theta + np.pi*2
 
@@ -81,9 +67,14 @@ def turn(radians, angular_vel, start_time, start_pos, current_theta):
     return wypts, new_start_time, start_pos, final_theta  
 
 #wp3, start_time3, start_pos3, start_theta3 = turn(np.pi, np.pi/4, start_time, start_pos, start_theta)
-wp3 = turn(-2*np.pi, np.pi/4, start_time, start_pos, start_theta)[0]
+#wp3 = turn(-2*np.pi, np.pi/4, start_time, start_pos, start_theta)[0]
 #print(wp3)
 
+# def connect_straight_turn(straight_turn_inputs):
+#     """user input should be a __ of straight functions or turn functions
+#     function will output the waypoints for the given straight line and turns"""
+#     for i in len(straight_turn_inputs):
+#         if 'straight' in straight_turn_inputs[i]:
 
 
 
