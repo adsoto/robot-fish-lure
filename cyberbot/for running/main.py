@@ -1,15 +1,21 @@
-#File used for flashing onto microbits. 
-"""used to load programs onto the transmitter/reciever for microbit control. Make sure to open main.py
-in a new window and copy/paste the program you want to flash (transmitter or reciever) into main.py.
-Then flash main.py to the microbit - follow code documentation in the summer 2023 google drive"""
+#File to flash onto reciever microbit. Paste into main.py as needed. Use summer 2023 code documentation
 
+# terminal_controlled_bot_wireless
 from microbit import *
+from cyberbot import *
+from feedback360 import *
 import radio
 
 radio.on()
 radio.config(channel=7,length=64)
+drive.connect()
 
 while True:
+    packet = radio.receive()
 
-   packet = input()
-   radio.send(packet)
+    if packet is not None:
+        dict = eval(packet)
+
+        vL = dict['vL']
+        vR = dict['vR']
+        drive.speed(vL, vR)

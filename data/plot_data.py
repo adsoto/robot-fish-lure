@@ -10,15 +10,15 @@ import matplotlib.pyplot as plt
 #              https://stackoverflow.com/questions/44970881/matplotlib-multiple-scatter-subplots-with-shared-colour-bar
 
 ## Choose CSV file to read for plotting
-df = pd.read_csv('data/06.16.2023/10.14.csv') # read csv file from data folder. Ex: 'data/06.13.2023/13.17.csv' reads the 13.17.csv file from the 06.13.2023 subfolder inside data folder
+df = pd.read_csv('data/06.30.2023/08.23.csv') # read csv file from data folder. Ex: 'data/06.13.2023/13.17.csv' reads the 13.17.csv file from the 06.13.2023 subfolder inside data folder
 # print(df['Desired Position: y (m)'])
 # for col in df.columns:
 #     print(col)
 
 # ~~ PLOT 1: Positions (actual/desired) ~~
 fig, ax = plt.subplots()
-line1 = ax.scatter(df['Desired Position: x (m)'], df['Desired Position: y (m)'], s=5)
-line2 = ax.scatter(df['Actual Position: x (m)'],df['Actual Position: y (m)'], s=5)
+line1 = ax.scatter(df['Desired Position: x (m)'], df['Desired Position: y (m)'])
+line2 = ax.scatter(df['Actual Position: x (m)'],df['Actual Position: y (m)'])
 
 # set the legend for multiple plots
 ax.legend(['Desired Position', 'Actual Position'])
@@ -27,8 +27,8 @@ ax.legend(['Desired Position', 'Actual Position'])
 ax.set_title('Postions')
 ax.set_xlabel('X (m)')
 ax.set_ylabel('Y (m)')
-ax.set_ylim(0, 0.5)
-ax.set_xlim(0, 0.5)
+ax.set_ylim(0, 0.6)
+ax.set_xlim(0, 0.6)
 #ax.set_aspect(aspect=1)
 
 ## ~~ PLOT 2: X and Y (actual/desired) Positions ~~
@@ -37,12 +37,12 @@ fig1.set_size_inches(10,4)
 fig1.tight_layout
 
 # make scatter subplot 1
-line1 = axs1.scatter(df['Desired X-Pos vs. Time: time(s)'], df['Desired Position: x (m)'], s=5)
-line2 = axs1.scatter(df['Actual X-Pos vs. Time: time(s)'], df['Actual Position: x (m)'], s=5)
+line1 = axs1.scatter(df['Desired X-Pos vs. Time: time(s)'], df['Desired Position: x (m)'])
+line2 = axs1.scatter(df['Actual X-Pos vs. Time: time(s)'], df['Actual Position: x (m)'])
 
 # make scatter subplot 2
-line1 = axs2.scatter(df['Desired X-Pos vs. Time: time(s)'], df['Desired Position: y (m)'], s=5)
-line2 = axs2.scatter(df['Actual X-Pos vs. Time: time(s)'], df['Actual Position: y (m)'], s=5)
+line1 = axs2.scatter(df['Desired X-Pos vs. Time: time(s)'], df['Desired Position: y (m)'])
+line2 = axs2.scatter(df['Actual X-Pos vs. Time: time(s)'], df['Actual Position: y (m)'])
 axs2.set_ylim(0,0.5)
 
 # set title of subplot 1
@@ -59,8 +59,8 @@ axs2.legend(['Desired Position', 'Actual Position'])
 ## ~~ PLOT 3: Theta and Velocity ~~
 fig2, (axs3, axs4) = plt.subplots(1, 2)
 fig2.set_size_inches(12,4)
-line1 = axs3.scatter(df['Theta vs. Time: time(s)'], df['Theta vs. Time: theta (rads)'], s=5)
-line2 = axs4.scatter(df['Robot Velocity: time (s)'], df['Robot Velocity: velocity (m/s)'], s=5)
+line1 = axs3.scatter(df['Theta vs. Time: time(s)'], df['Theta vs. Time: theta (rads)'])
+line2 = axs4.scatter(df['Robot Velocity: time (s)'], df['Robot Velocity: velocity (m/s)'])
 
 # set title of subplot 1
 axs3.set_title('Theta vs Time')

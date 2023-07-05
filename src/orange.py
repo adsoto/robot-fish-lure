@@ -64,8 +64,8 @@ class VideoProcessor:
         greybin = cv2.cvtColor(thresh_img, cv2.COLOR_RGB2GRAY)
         ret, bwthresh= cv2.threshold(greybin, 10, 255, cv2.THRESH_BINARY) #converts the greyscale orange mask to binary
 
-        cv2.imshow("orange thresh",thresh_img)
-        cv2.imshow("blackwhite thresh", bwthresh)
+        # cv2.imshow("orange thresh",thresh_img)
+        #cv2.imshow("blackwhite thresh", bwthresh)
         
         if self._save_video: self._out.write(frame)
 

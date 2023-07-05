@@ -14,21 +14,34 @@ import data_handler as dh
 import matplotlib.pyplot as plt
 import video_processor as vp
 import orange as orange
+import centroidTracker 
 trajectory = rect_trajectory
+trajBD = trajBD
+trajAC = trajAC
+trajCA = trajCA
+trajDB = trajDB
+totaltime = trajectory[len(trajectory)-1][0]
 
 class Controller():
    """Top-level class to run the robotic fish"""
 
    def __init__(self, lookahead=20, spacing=.001, plot_data=True, save_data=True, camera_port=0, camera_bounds = np.array([[420, 365], [1340, 905]]),
-                save_video=False, transmit_port='/dev/tty.usbmodem1402'):
+                save_video=True, transmit_port='/dev/tty.usbmodem1402'):
        print("initializing controller")
        self._ser = serial.Serial(transmit_port, baudrate=115200)
        self._lookahead = lookahead
        self._data_handler = dh.DataHandler(plot_data, save_data)
        self._video = orange.VideoProcessor(camera_port, camera_bounds, save_video)
+       self._centroidTracker = centroidTracker.centroidTracker(camera_port, camera_bounds, save_video)
        self._robot_arr = []
        self._time_arr = []
        self._theta_arr = []
+
+   def updateTraj(self, trajectory):
+      for traj in trajectory:
+            traj[0]=traj[0]+totaltime
+      #print(trajectory) 
+      return trajectory
 
    def send_commands(self, vR, vL):
        """Sends commands to the transmit board over the serial port"""
@@ -39,7 +52,7 @@ class Controller():
 
    def find_target(self, trajectory, currentTime):
        """Finds the next target in the path for the bot to track"""
-       dt = 0.05
+       dt = 0.08
        [head, tail] = self._video.get_coords(2)
        fish_vect = head - tail
        theta = np.arctan2(fish_vect[1], fish_vect[0])
@@ -66,7 +79,7 @@ class Controller():
             # else case for if robot trajectory time is greater than ttrack - holly
        return target
 
-   def run(self):
+   def run(self, trajectory):
        """Runs the bot"""
        start_time = time.time()
        currentTime = time.time() - start_time
@@ -78,19 +91,66 @@ class Controller():
 
        #print(len(self._path)) ###
        #print(targetIndex)
-       while currentTime < tmax:
+       while currentTime < tmax: #change so that tmax is user input
            [head, tail] = self._video.get_coords(2)
            fish_vect = head - tail
            theta = np.arctan2(fish_vect[1], fish_vect[0])
            robot_pos = (head + tail)/2
            currentTime = time.time() - start_time
+            #one function that returns an object state 
+            #make into a class - make own file 
+
 
            target1 = self.find_target(trajectory, currentTime)
            
            [vRight, vLeft] = track_point(robot_pos, target1, theta, 0) # note theta_des = 0
+
+           [newhead, newtail] = self._video.get_coords(2)
+           newfish_vect = newhead - newtail
+           newtheta = np.arctan2(newfish_vect[1], newfish_vect[0])
+           newrobot_pos = (newhead + newtail)/2
+           self._centroidTracker.get_fish_thresh()
+
+
+           for i in range(1, len(trajectory)):
+               corner = [trajectory[i][1], trajectory[i][2]]
+               if np.linalg.norm(newrobot_pos-corner) < 0.05: #maybe this should be regular robot pos? not new?
+                   print("in corner", i)
+                   minDist = self._centroidTracker.findClosestNeighbor()
+                   if minDist:
+                   #print("mindist: ", minDist)
+                        print('neighbor found:',  minDist)
+                        if minDist < 0.07:
+                            print('there is something' , minDist)
+                            print("time to evade")
+                            print(i)
+                            #for i in range(10): self.send_commands(0, 0)
+                            if i == 1:
+                                c.run(trajBD)  #can replace calling set trajectories with own trajectories that call time.time()
+                                #c.run(rect_trajectoryD)
+                            if i == 2: 
+                                c.run(trajCA)
+                                #c.run(rect_trajectoryA)
+                            if i == 3:
+                                c.run(trajDB)
+                                #c.run(rect_trajectoryB)
+                            if i == 4:
+                                c.run(trajAC)
+                                #c.run(rect_trajectoryC)
+                        
+                    
+                            
+                   #check fish neighbor and get distance
+                   #if fish position distance< 0.05, then check what corner it's at, and run a certain trajectory
+                   #if i == 1:
+                    #  c.run(trajBD)
+
+           
           
            #targetIndex = self.find_target(currentTime)
            #print(targetIndex) ###
+
+
 
            if self._video._go:
                self._time_arr.append(currentTime)
@@ -101,9 +161,9 @@ class Controller():
                start_time = time.time() # reset start time
            self._video.display(target1)
 
-           print('time:', currentTime)
-           print('target:', target1) 
-           print('pos:', robot_pos)
+           #print('time:', currentTime)
+           #print('target:', target1) 
+           #print('pos:', robot_pos)
 
 
   
@@ -154,11 +214,20 @@ if __name__ == '__main__':
     #LAIR: [ 687  396][1483  801]
     #keck: [570,  311], [1442, 802]
     # keck camera 2: [[ 699    9], [1204  892]]
-   bounds = np.array([[570,  311], [1442, 802]])   # find these with calibrate_setup.py
+    camera_bounds = np.array([[590, 331], [1430, 801]]) # find these with calibrate_setup.py
+    # find these with calibrate_setup.py
+    port_t = '/dev/tty.usbmodem1102'                # find this with ls /dev/tty.usb*   Change this port as needed
+    port_c = 0                                      # either 0 or 1
+    c = Controller(camera_bounds = camera_bounds, camera_port = port_c, transmit_port = port_t,
+                    lookahead = 1)
+    
 
-   port_t = '/dev/tty.usbmodem1402'                # find this with ls /dev/tty.usb*   Change this port as needed
-   port_c = 0                                      # either 0 or 1
-   c = Controller(camera_bounds = bounds, camera_port = port_c, transmit_port = port_t,
-                  lookahead = 1)
-   c.run()
-   c.end()
+    
+    for i in range(0,5):
+        c.run(trajectory)
+        #c.updateTraj(trajectory)
+
+
+    #no for loop 
+
+    c.end()
