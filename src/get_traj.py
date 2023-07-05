@@ -1,18 +1,21 @@
 
 import numpy as np
 from positions_in_tank import *
+from make_traj_pts import straight_traj, rot_traj
+import time
 
-
-def get_traj(Xr, Xf, current_traj):
+def get_traj(X_r, X_f, current_traj):
     """gets the next trajectory of the lure based on the current position of the lure, the fish and the current trajectory"""
     # robot state: [time, x, y, theta]
-    curr_time = Xr[0]
-    rob_pos = [Xr[1], Xr[2]]
-    fish_pos = [Xf[1], Xf[2]]
+    curr_time = X_r[0]
+    rob_pos = [X_r[1], X_r[2]]
+    fish_pos = [X_f[1], X_f[2]]
     radius_about_pt = 0.05 # 5 cm
     fish_alert_radius = 0.08 # 8 cm
-    time_to_pt = 2 # time to add for new trajectory
     theta = 0; # desired theta currently defaulting to 0
+    # start_time initialized in c.run = gloabl computer time = wonky number
+    # current_time initialized in c.run = corrected robot start time
+    current_time = 0 # placeholder until it is called in c.run
 
     # lure not done with current trajectory
     if curr_time < current_traj[-1][0]:
@@ -24,11 +27,13 @@ def get_traj(Xr, Xf, current_traj):
         if np.linalg.norm(fish_pos - rob_pos) <= fish_alert_radius:
             # !! need to update this to give trajectory instead of just a single destination traj point
             # A->C
-            new_traj = np.append((curr_time + time_to_pt), C, theta) # dart diag. across tank
+            dist = np.linalg.norm(rob_pos-C)
+            new_traj =  straight_traj(dist, 0.08, current_time, rob_pos, 0)  # dart diag. across tank
             return new_traj
         else: # fish not close
             #A->B
-            new_traj = np.append((curr_time + time_to_pt), B, theta)
+            dist = np.linalg.norm(rob_pos-B)
+            new_traj =  straight_traj(dist, 0.05, current_time, rob_pos, 0)
             return new_traj
         
     # same code format for checking robot at pts B, C, D
@@ -38,11 +43,13 @@ def get_traj(Xr, Xf, current_traj):
         if np.linalg.norm(fish_pos - rob_pos) <= fish_alert_radius:
             # !! need to update this to give trajectory instead of just a single destination traj point
             # B->D
-            new_traj = np.append((curr_time + time_to_pt), D, theta) # dart diag. across tank
+            dist = np.linalg.norm(rob_pos-D)
+            new_traj =  straight_traj(dist, 0.05, current_time, rob_pos, 0) # dart diag. across tank
             return new_traj
         else: # fish not close
             #B->C
-            new_traj = np.append((curr_time + time_to_pt), C, theta)
+            dist = np.linalg.norm(rob_pos-C)
+            new_traj =  straight_traj(dist, 0.05, current_time, rob_pos, 0)
             return new_traj
     
     # if at pos C   
@@ -51,11 +58,13 @@ def get_traj(Xr, Xf, current_traj):
         if np.linalg.norm(fish_pos - rob_pos) <= fish_alert_radius:
             # !! need to update this to give trajectory instead of just a single destination traj point
             # C->A
-            new_traj = np.append((curr_time + time_to_pt), A, theta) # dart diag. across tank
+            dist = np.linalg.norm(rob_pos-A)
+            new_traj =  straight_traj(dist, 0.05, current_time, rob_pos, 0) # dart diag. across tank
             return new_traj
         else: # fish not close
             #C->D
-            new_traj = np.append((curr_time + time_to_pt), D, theta)
+            dist = np.linalg.nomr(rob_pos-D)
+            new_traj =  straight_traj(dist, 0.05, current_time, rob_pos, 0)
             return new_traj
 
     # if at pos D    
@@ -64,10 +73,12 @@ def get_traj(Xr, Xf, current_traj):
         if np.linalg.norm(fish_pos - rob_pos) <= fish_alert_radius:
             # !! need to update this to give trajectory instead of just a single destination traj point
             # D->B
-            new_traj = np.append((curr_time + time_to_pt), B, theta) # dart diag. across tank
+            dist = np.linalg.norm(rob_pos-B)
+            new_traj =  straight_traj(dist, 0.05, current_time, rob_pos, 0) # dart diag. across tank
             return new_traj
         else: # fish not close
             #D->A
-            new_traj = np.append((curr_time + time_to_pt), A, theta)
+            dist = np.linalg.norm(rob_pos-A)
+            new_traj =  straight_traj(dist, 0.05, current_time, rob_pos, 0)
             return new_traj
 
