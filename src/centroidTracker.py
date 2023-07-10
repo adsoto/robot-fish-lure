@@ -7,6 +7,7 @@ from datetime import datetime
 import os
 from tracker import *
 import convert as c
+import object_state
 
 PIX2METERS = .635/820 # meters/pixels conversion
 FPS = 10
@@ -249,8 +250,10 @@ class centroidTracker:
                 if (distance) < minDist:
                     minDist = distance
                     closestFish = fish
-            print(minDist)
-            return minDist
+            #print(minDist)
+            return closestFish
+        
+
         # cv2.circle(self._current_frame, closestFish, 10, (255, 0, 255), -1)
         # cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
         # cv2.resizeWindow('frame', 400, 400)
@@ -258,6 +261,18 @@ class centroidTracker:
         # cv2.waitKey(0)
         
 
+    def get_closest_fish_state(self, t):
+
+        fish_pos = self.findClosestNeighbor()
+
+        if fish_pos:
+            closest_fish_state = object_state.Object(t, fish_pos[0], fish_pos[1], 0) #theta is 0 for now?? how to calculate this? same as lure?
+            return closest_fish_state
+
+   
+
+        
+        
     def displayWindows(self):
         #displays original video
         closestlist = ct.findClosestNeighbor()

@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 import os
 from datetime import datetime
+import object_state
 
 PIX2METERS = .635/820 # meters/pixels conversion TODO: automate this calculation in __init__
 FPS = 10
@@ -21,6 +22,7 @@ class VideoProcessor:
         self._height = camera_bounds[1,1]-camera_bounds[0,1]
         self._go = True # not implemented
         self._current_frame = None
+        #self._get_coords = get_coords
         self._bounds = camera_bounds
 
         if save_video == True: # not tested            
@@ -85,11 +87,21 @@ class VideoProcessor:
         coords[:,1] = self._height - coords[:,1] # move origin to lower left corner
         return coords*PIX2METERS
     
+    def get_robot_state(self, t):
+        [head, tail] = self.get_coords(2)
+        fish_vect = head - tail
+        theta = np.arctan2(fish_vect[1], fish_vect[0])
+        robot_pos = (head + tail)/2
+
+        robot_state = object_state.Object(t, robot_pos[0], robot_pos[1], theta)
+
+        return robot_state
+    
     def display(self, target):
         """Shows live video feed, plotting dots on identified objects and the bot target"""
 
         if self._current_frame is not None:
-            cv2.circle(self._current_frame, (int(target[0]/PIX2METERS), int(self._height-target[1]/PIX2METERS)), 5, (0, 159, 22), -1)
+            cv2.circle(self._current_frame, (int(target.x/PIX2METERS), int(self._height-target.y/PIX2METERS)), 5, (0, 159, 22), -1)
             cv2.namedWindow("output", cv2.WINDOW_NORMAL)
             resized = cv2.resize(self._current_frame, (960, 540))
             cv2.imshow('frame', resized)
@@ -100,6 +112,7 @@ class VideoProcessor:
                 self._go = False
     
     def is_go(self):
+        print("here")
         return self._go
 
     def cleanup(self):
@@ -114,7 +127,7 @@ if __name__ == '__main__':
     camera_bounds = np.array([[467, 382], [1290, 862]]) # find these with calibrate_setup.py
     vp = VideoProcessor(camera_index, camera_bounds, True)
     while True:
-        vp.get_coords(1)
+        vp.get_coords(1) #should this be 2?? 
         vp.display()
         if not vp.is_go(): break
     vp.cleanup()
