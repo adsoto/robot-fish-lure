@@ -31,6 +31,7 @@ bg_model = cv2.createBackgroundSubtractorKNN(history = 800, dist2Threshold = 255
 
 backgroundPath = r"C:\Users\ginar\Documents\robot-fish-lure\videos\background.mp4"
 backgroundCapture = cv2.VideoCapture(backgroundPath)
+backret, backframe = backgroundCapture.read()
 
 
 class centroidTracker:
@@ -74,27 +75,24 @@ class centroidTracker:
         cv2.waitKey(30)
 
 
-
-    def remove_background(self, inputret, inputframe):
-        ret, frame = inputret, inputframe
-        backret, backframe = self._backcap.read()
-
-        if (not backret or not ret): 
+    def remove_background(self):
+        ret, frame = self._cap.read()
+        if (not backret): 
             print("frame has nothing")
             exit(0)
 
         backframe = cv2.undistort(backframe, MTX, DIST, None, MTX)
         backframe = backframe[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
 
-        backframe = cv2.cvtColor(backframe, cv2.COLOR_BGR2GRAY)
-        ret, backthresh = cv2.threshold(backframe,200,255,cv2.THRESH_BINARY)
-        bg_inv = cv2.bitwise_not(backthresh)
+        backframe = cv2.cvtColor(backframe, cv2.COLOR_BGR2HSV)
+        #ret, backthresh = cv2.threshold(backframe,200,255,cv2.THRESH_BINARY)
+        bg_inv = cv2.bitwise_not(backframe)
         frame_sub = cv2.add(frame, bg_inv)
 
         cv2.imshow("bg", bg_inv)
         #cv2.imshow('frame', frame)
         cv2.imshow("frame sub", frame_sub)
-        #cv2.waitKey(1)
+        cv2.waitKey(1)
 
         return frame_sub
 
@@ -116,10 +114,7 @@ class centroidTracker:
         # upper_orange= np.array([250, 210, 255], dtype = "uint8")
     
         lower_orange = np.array([0, 80, 205])    # Adjust these values for the specific orange range
-        upper_orange = np.array([255, 255, 255])
-
-        lower_orange2 = np.array([0, 50, 100]) 
-        upper_orange2 = np.array([10, 255, 255])
+        upper_orange = np.array([255, 210, 255])
 
         lure_mask=cv2.inRange(lure_hsv,lower_orange,upper_orange)
         kernellure = np.ones((10,10),np.uint8)
@@ -187,8 +182,8 @@ class centroidTracker:
             # upper_orange = np.array([255, 255, 255])
 
 
-            fish_lower = np.array([10,50,60], dtype = "uint8")
-            fish_upper = np.array([90,80,220], dtype = "uint8")
+            fish_lower = np.array([10,50,150], dtype = "uint8")
+            fish_upper = np.array([30,75,255], dtype = "uint8")
             fish_mask = cv2.inRange(fish_hsv, fish_lower, fish_upper)
             lurethresh = self.get_lure_thresh()
             invlure = cv2.bitwise_not(lurethresh)
@@ -213,6 +208,7 @@ class centroidTracker:
         cv2.imshow("frame", frame)
         cv2.waitKey(30)
         return fish_mask_opening
+    
 
     def get_fish_contours(self):
         fish_thresh = self.get_fish_thresh()
@@ -245,7 +241,6 @@ class centroidTracker:
                 x, y, w, h = cv2.boundingRect(cnt)
                 fishdetections.append([x, y, w, h])
 
-        
         fish_boxes_ids = fishTracker.update(fishdetections) # contains fish identifications
         for box_id in fish_boxes_ids:
             x, y, w, h, id = box_id
@@ -358,11 +353,11 @@ if __name__ == '__main__':
     #cap = cv2.VideoCapture(foregroundPath)
     #ret, frame = cap.read()
     camera_bounds = np.array([[577, 305], [1435, 820]]) # find these with calibrate_setup.py
-    ct = centroidTracker(camera_index, camera_bounds, False)
+    ct = centroidTracker(foregroundPath, camera_bounds, False)
     while True:
         #ct.get_coords(1)
         #ct.displayWindows()
-        ct.get_fish_thresh()
+        ct.get_fish_thresh_combos()
         #ct.show_frame()
         if not ct.is_go(): break
     ct.cleanup()
