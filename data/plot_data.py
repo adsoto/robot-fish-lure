@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 #              https://stackoverflow.com/questions/44970881/matplotlib-multiple-scatter-subplots-with-shared-colour-bar
 
 ## Choose CSV file to read for plotting
-df = pd.read_csv('data/06.30.2023/08.23.csv') # read csv file from data folder. Ex: 'data/06.13.2023/13.17.csv' reads the 13.17.csv file from the 06.13.2023 subfolder inside data folder
+df = pd.read_csv('data/07.11.2023/11.50.csv') # read csv file from data folder. Ex: 'data/06.13.2023/13.17.csv' reads the 13.17.csv file from the 06.13.2023 subfolder inside data folder
 # print(df['Desired Position: y (m)'])
 # for col in df.columns:
 #     print(col)
@@ -62,12 +62,12 @@ fig2.set_size_inches(12,4)
 line1 = axs3.scatter(df['Theta vs. Time: time(s)'], df['Theta vs. Time: theta (rads)'])
 line2 = axs4.scatter(df['Robot Velocity: time (s)'], df['Robot Velocity: velocity (m/s)'])
 
-# set title of subplot 1
+# # set title of subplot 1
 axs3.set_title('Theta vs Time')
 axs3.set_xlabel('Time (s)')
 axs3.set_ylabel('Theta')
 
-# set title of subplot 2
+# # set title of subplot 2
 axs4.set_title('Velocity vs Time')
 axs4.set_xlabel('Time (s)')
 axs4.set_ylabel('Velocity (m/s)')
