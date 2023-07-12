@@ -40,7 +40,7 @@ class Controller():
 
    def find_target(self, traj, t):
        """Finds the next target in the path for the bot to track"""
-       dt = 1 #is this still what we want? 
+       dt = 0.5 #is this still what we want? 
        X_r = self._video.get_robot_state(t) #in orange, do we even need this in here though?
        final_pos = [traj[len(traj)-1][1], traj[len(traj)-1][2]]
        ttrack = t+dt
@@ -57,13 +57,14 @@ class Controller():
                distancevector = np.subtract(pos2, pos1) 
                target = pos1 + percentTime*distancevector
                print("target:" , target)
-               X_des = object_state.Object(t, target[0], target[1], 0)
+               print("theta des from traj: ", traj[3])
+               X_des = object_state.Object(t, target[0], target[1], traj[i][3])
                return X_des
            elif ttrack > traj[len(traj)-1][0]:
                print('entered2')
                target = [traj[len(traj)-1][1], traj[len(traj)-1][2]]
                print("target:" , target)
-               X_des = object_state.Object(t, target[0], target[1], 0)
+               X_des = object_state.Object(t, target[0], target[1], traj[i][3])
                return X_des
             # else case for if robot trajectory time is greater than ttrack 
 
@@ -72,14 +73,14 @@ class Controller():
        #initialize clock
        start_time = time.time()
        current_time = time.time() - start_time
-       max_time = 5 #change this as needed
+       max_time = 30 #change this as needed
 
 
        X_r = self._video.get_robot_state(current_time)
        #curr_time = X_r.t
-       rob_pos = [X_r.x, X_r.y]
-       rob_x = X_r.x
-       rob_y = X_r.y
+       rob_pos = [A[0], A[1]]
+       rob_x = A[0]
+       rob_y = A[1]
        B_x = B[0]
        B_y = B[1]
        Bxdist = np.square(B_x - rob_x)
@@ -88,7 +89,7 @@ class Controller():
        dist = B_rob_dist
        theta = np.arctan2((B_y - rob_y), (B_x - rob_x))
        #print("dist:", dist)
-       print("rob_pos:", rob_x, rob_y)
+       #print("rob_pos:", rob_x, rob_y)
 
        traj_t = make_traj_pts.straight_traj(dist, 0.05, current_time, rob_pos, theta)
        
@@ -101,7 +102,7 @@ class Controller():
 
           print("robot state", X_r.x, X_r.y)
           X_f = self._centroidTracker.get_closest_fish_state(current_time) #closest fish
-          print("fish state" , X_f.x, X_f.y)
+          #print("fish state" , X_f.x, X_f.y)
 
           #how to initialize an initial trajectory? 
           traj_t = get_traj.get_traj_function(X_r, X_f, traj_t) #how to set this up to keep feeding previous trajs?

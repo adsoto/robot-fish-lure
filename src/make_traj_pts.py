@@ -14,12 +14,13 @@ def straight_traj(dist, vel, start_time, start_pos, theta_dir): # theta_dir is t
    total_time = dist/vel
    num_pts = round(total_time/dt)
   
-   wypts = [[] for i in range(0,num_pts)]
+   wypts = [[] for i in range(0,num_pts+1)]
    for i in range(1,num_pts+1):
        new_x = round( start_pos[0] + (i/num_pts) * np.cos(theta_dir)*dist, 3)
        new_y = round( start_pos[1] + (i/num_pts) * np.sin(theta_dir)*dist, 3)
-       new_time = start_time + i*dt
-       wypts[(i-1)] = [new_time, new_x, new_y, round(theta_dir,3)]
+       new_time = start_time + (i+1)*dt
+       wypts[0] = [start_time+dt, start_pos[0], start_pos[1], theta_dir]
+       wypts[(i)] = [new_time, new_x, new_y, round(theta_dir,3)]
        ### !! How do i return this in an array of arrays when array sizes cannot be changed??
        #wypts[i] = [new_time, new_x, new_y, theta_dir]
    start_pos = [new_x, new_y]
@@ -28,14 +29,14 @@ def straight_traj(dist, vel, start_time, start_pos, theta_dir): # theta_dir is t
    return wypts
 
 
-# wp1= straight_traj(1.5, 0.2, start_time, start_pos, start_theta)
-# print(wp1)
+wp1= straight_traj(1.5, 0.2, start_time, start_pos, start_theta)
+print(wp1)
 # print(wp1[0][0])
-# #wp2 = straight_traj(1, 0.2, start_time1, start_pos1, start_theta1)[0]
-# #print(wp2)
+#wp2 = straight_traj(1, 0.2, start_time1, start_pos1, start_theta1)[0]
+#print(wp2)
 
-# wp2 = straight_traj(0.3845640979165634, 0.1, 0.077, start_pos,  0)
-# print(wp2)
+wp2 = straight_traj(0.3845640979165634, 0.1, 0.077, start_pos,  0)
+print(wp2)
 
 
 
