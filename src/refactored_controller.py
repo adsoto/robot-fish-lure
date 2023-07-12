@@ -81,19 +81,19 @@ class Controller():
        rob_x = X_r.x
        rob_y = X_r.y
 
-       b_x = B[0]
-       b_y = B[1]
-       a_x = A[0]
-       a_y = A[1]
+       B_x = B[0]
+       B_y = B[1]
+       A_x = A[0]
+       A_y = A[1]
 
        #B_rob_dist = np.sqrt(np.square(B_x - rob_x) + np.square(B_y-rob_y))
-       a_b_dist = np.sqrt(np.square(b_x - a_x) + np.square(b_y - a_y))
+       a_b_dist = np.sqrt(np.square(B_x - A_x) + np.square(B_y - A_y))
        dist = a_b_dist
-       theta = np.arctan2((b_y - a_y), (b_x - a_x))
+       theta = np.arctan2((B_y - A_y), (B_x - A_x))
        #print("dist:", dist)
        print("rob_pos:", rob_x, rob_y)
 
-       traj_t = make_traj_pts.straight_traj(dist, 0.05, current_time, rob_pos, theta)
+       traj_t = make_traj_pts.straight_traj(dist, 0.05, current_time, A, theta)
        
        
        while current_time < max_time:
@@ -104,7 +104,7 @@ class Controller():
 
           print("robot state", X_r.x, X_r.y)
           X_f = self._centroidTracker.get_closest_fish_state(current_time) #closest fish
-          print("fish state" , X_f.x, X_f.y)
+          #print("fish state" , X_f.x, X_f.y)
 
           #how to initialize an initial trajectory? 
           traj_t = get_traj.get_traj_function(X_r, X_f, traj_t) #how to set this up to keep feeding previous trajs?
@@ -201,7 +201,7 @@ if __name__ == '__main__':
     # keck camera 2: [[ 699    9], [1204  892]]
     camera_bounds = np.array([[590, 331], [1430, 801]]) # find these with calibrate_setup.py
     # find these with calibrate_setup.py
-    port_t = '/dev/tty.usbmodem1302'                # find this with ls /dev/tty.usb*   Change this port as needed
+    port_t = '/dev/tty.usbmodem141302'                # find this with ls /dev/tty.usb*   Change this port as needed
     port_c = 0                                      # either 0 or 1
     c = Controller(camera_bounds = camera_bounds, camera_port = port_c, transmit_port = port_t)
     

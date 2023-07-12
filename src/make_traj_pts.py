@@ -2,7 +2,7 @@
 import numpy as np
 
 
-start_pos = np.array([0,0])
+start_pos = [0,0]
 start_time = 0
 dt = 0.5
 start_theta = 0
@@ -12,12 +12,12 @@ def straight_traj(dist, vel, start_time, start_pos, theta_dir): # theta_dir is t
    """generates a single trajectory waypoint for the robot to move the desired distance at the desired speed """
   
    total_time = dist/vel
-   num_pts = round(total_time/dt)
+   num_pts = int(total_time/dt)
   
-   wypts = [] #[[] for i in range(0,num_pts)]
+   wypts = [[] for i in range(0,num_pts)]
    for i in range(1,num_pts+1):
-       new_x = round( start_pos[0] + (i/num_pts) * np.cos(theta_dir)*dist, 3)
-       new_y = round( start_pos[1] + (i/num_pts) * np.sin(theta_dir)*dist, 3)
+       new_x = round( start_pos[0] + ((i-1)/num_pts) * np.cos(theta_dir)*dist, 3)
+       new_y = round( start_pos[1] + ((i-1)/num_pts) * np.sin(theta_dir)*dist, 3)
        new_time = start_time + i*dt
        wypts[(i-1)] = [new_time, new_x, new_y, round(theta_dir,3)]
        ### !! How do i return this in an array of arrays when array sizes cannot be changed??
@@ -27,8 +27,8 @@ def straight_traj(dist, vel, start_time, start_pos, theta_dir): # theta_dir is t
    # returns a waypoint and the start_pos and start_time required as input for a following waypoint
    return wypts
 
-# wp1= straight_traj(1.5, 0.2, start_time, start_pos, start_theta)
-# print(wp1)
+wp1= straight_traj(1.5, 0.2, start_time, start_pos, start_theta)
+print(wp1)
 
 # waypoint format: [time, x, y, theta]
 
@@ -63,12 +63,6 @@ def rot_traj(radians, angular_vel, start_time, start_pos, current_theta):
 
        wypts[(i-1)] = [new_time, start_pos[0], start_pos[1], new_theta]
    return wypts
-
-# def connect_straight_turn(straight_turn_inputs):
-#     """user input should be a __ of straight functions or turn functions
-#     function will output the waypoints for the given straight line and turns"""
-#     for i in len(straight_turn_inputs):
-#         if 'straight' in straight_turn_inputs[i]:
 
 
 
