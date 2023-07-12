@@ -62,10 +62,20 @@ def track_point(desired_state, current_state):
     elif alpha >  np.pi: alpha = alpha - np.pi*2
     if beta < -np.pi: beta = beta + np.pi*2 # keep beta within -pi to pi
     elif beta >  np.pi: beta = beta - np.pi*2
+    
+    ### edits: point turns if robot within waypoint radius
+    K_rot = 1.2 
+    wypt_radius = 0.05 # 5 cm 
+    accep_angle_error = 0.01 #radian 
 
-    # proportional control
-    v = K_R*rho
-    w = K_A*alpha + K_B*beta
+    # checks if robot is near waypoint
+    if np.sqrt(np.square(deltay) + np.square(deltax)) < wypt_radius and alpha > accep_angle_error:
+        v = 0 
+        w = K_rot*alpha 
+    else: # normal proportional control values bnc robot not at waypoint yet
+        v = K_R*rho
+        w = K_A*alpha + K_B*beta
+
 
     # control signals
     vRight = (2*v + w*L)/(2*R)
