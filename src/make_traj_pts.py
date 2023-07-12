@@ -14,7 +14,7 @@ def straight_traj(dist, vel, start_time, start_pos, theta_dir): # theta_dir is t
    total_time = dist/vel
    num_pts = round(total_time/dt)
   
-   wypts = [[] for i in range(0,num_pts)]
+   wypts = [] #[[] for i in range(0,num_pts)]
    for i in range(1,num_pts+1):
        new_x = round( start_pos[0] + (i/num_pts) * np.cos(theta_dir)*dist, 3)
        new_y = round( start_pos[1] + (i/num_pts) * np.sin(theta_dir)*dist, 3)
@@ -27,23 +27,10 @@ def straight_traj(dist, vel, start_time, start_pos, theta_dir): # theta_dir is t
    # returns a waypoint and the start_pos and start_time required as input for a following waypoint
    return wypts
 
-
 # wp1= straight_traj(1.5, 0.2, start_time, start_pos, start_theta)
 # print(wp1)
-# print(wp1[0][0])
-# #wp2 = straight_traj(1, 0.2, start_time1, start_pos1, start_theta1)[0]
-# #print(wp2)
-
-# wp2 = straight_traj(0.3845640979165634, 0.1, 0.077, start_pos,  0)
-# print(wp2)
-
-
-
-### straight
-
 
 # waypoint format: [time, x, y, theta]
-
 
 def rot_traj(radians, angular_vel, start_time, start_pos, current_theta):
    """turns the robot by _ radians at __ angular_velocity"""

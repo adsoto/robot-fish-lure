@@ -42,7 +42,7 @@ class Controller():
        """Finds the next target in the path for the bot to track"""
        dt = 1 #is this still what we want? 
        X_r = self._video.get_robot_state(t) #in orange, do we even need this in here though?
-       final_pos = [traj[len(traj)-1][1], traj[len(traj)-1][2]]
+       final_pos = [traj[-1][1], traj[-1][2]]
        ttrack = t+dt
        for i in range(1, len(traj)):
            #print('entered0')
@@ -57,13 +57,13 @@ class Controller():
                distancevector = np.subtract(pos2, pos1) 
                target = pos1 + percentTime*distancevector
                print("target:" , target)
-               X_des = object_state.Object(t, target[0], target[1], 0)
+               X_des = object_state.Object(t, target[0], target[1], traj[-1][3])
                return X_des
-           elif ttrack > traj[len(traj)-1][0]:
+           elif ttrack > traj[-1][0]:
                print('entered2')
-               target = [traj[len(traj)-1][1], traj[len(traj)-1][2]]
+               target = [traj[-1][1], traj[-1][2]]
                print("target:" , target)
-               X_des = object_state.Object(t, target[0], target[1], 0)
+               X_des = object_state.Object(t, target[0], target[1], traj[-1][3])
                return X_des
             # else case for if robot trajectory time is greater than ttrack 
 
@@ -80,13 +80,16 @@ class Controller():
        rob_pos = [X_r.x, X_r.y]
        rob_x = X_r.x
        rob_y = X_r.y
-       B_x = B[0]
-       B_y = B[1]
-       Bxdist = np.square(B_x - rob_x)
-       Bydist = np.square(B_y-rob_y)
-       B_rob_dist = np.sqrt(Bxdist+Bydist)
-       dist = B_rob_dist
-       theta = np.arctan2((B_y - rob_y), (B_x - rob_x))
+
+       b_x = B[0]
+       b_y = B[1]
+       a_x = A[0]
+       a_y = A[1]
+
+       #B_rob_dist = np.sqrt(np.square(B_x - rob_x) + np.square(B_y-rob_y))
+       a_b_dist = np.sqrt(np.square(b_x - a_x) + np.square(b_y - a_y))
+       dist = a_b_dist
+       theta = np.arctan2((b_y - a_y), (b_x - a_x))
        #print("dist:", dist)
        print("rob_pos:", rob_x, rob_y)
 
