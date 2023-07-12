@@ -46,9 +46,9 @@ class Controller():
        ttrack = t+dt
        for i in range(1, len(traj)):
            #print('entered0')
-           #print("ttrack:",ttrack)
-           if traj[i-1][0] < ttrack < traj[i][0]:
-               #print("entered1")
+           print("ttrack:",ttrack)
+           if traj[i-1][0] <= ttrack <= traj[i][0]:
+               print("entered1")
                t1 = traj[i-1][0]
                t2 = traj[i][0]
                percentTime = (ttrack-t1)/(t2-t1)
@@ -60,7 +60,7 @@ class Controller():
                X_des = object_state.Object(t, target[0], target[1], 0)
                return X_des
            elif ttrack > traj[len(traj)-1][0]:
-               #print('entered2')
+               print('entered2')
                target = [traj[len(traj)-1][1], traj[len(traj)-1][2]]
                print("target:" , target)
                X_des = object_state.Object(t, target[0], target[1], 0)
@@ -72,7 +72,7 @@ class Controller():
        #initialize clock
        start_time = time.time()
        current_time = time.time() - start_time
-       max_time = 30 #change this as needed
+       max_time = 5 #change this as needed
 
 
        X_r = self._video.get_robot_state(current_time)
@@ -86,10 +86,11 @@ class Controller():
        Bydist = np.square(B_y-rob_y)
        B_rob_dist = np.sqrt(Bxdist+Bydist)
        dist = B_rob_dist
+       theta = np.arctan2((B_y - rob_y), (B_x - rob_x))
        #print("dist:", dist)
        print("rob_pos:", rob_x, rob_y)
-       
-       traj_t = make_traj_pts.straight_traj(dist, 0.05, current_time, rob_pos, 0)
+
+       traj_t = make_traj_pts.straight_traj(dist, 0.05, current_time, rob_pos, theta)
        
        
        while current_time < max_time:
@@ -100,7 +101,7 @@ class Controller():
 
           print("robot state", X_r.x, X_r.y)
           X_f = self._centroidTracker.get_closest_fish_state(current_time) #closest fish
-          #print("fish state" , X_f.x, X_f.y)
+          print("fish state" , X_f.x, X_f.y)
 
           #how to initialize an initial trajectory? 
           traj_t = get_traj.get_traj_function(X_r, X_f, traj_t) #how to set this up to keep feeding previous trajs?
@@ -172,13 +173,16 @@ class Controller():
         ## add series saves raw data and then creates plots through data_handler.py
     self._data_handler.add_series('Desired Position', xdes, ydes,'x (m)', 'y (m)')
     self._data_handler.add_series('Actual Position', x, y,'x (m)', 'y (m)')
+
     self._data_handler.add_series('Desired X-Pos vs. Time', tdes, xdes, 'time(s)', "x (m)") ## need to have this line to get the correct time array for the desired position data
     self._data_handler.add_series('Actual X-Pos vs. Time', t, x, 'time(s)', "x (m)")
 
     self._data_handler.add_series('Desired Y-Pos vs. Time', tdes, ydes, 'time(s)', "y (m)")
     self._data_handler.add_series('Actual Y-Pos vs. Time', t, y, 'time(s)', "y (m)")
 
+    self._data_handler.add_series("Desired Theta vs. Time", tdes, thetades, 'time(s)', "theta (rads)")
     self._data_handler.add_series('Theta vs. Time', t, theta, 'time(s)', 'theta (rads)')
+
     self._data_handler.add_series('Robot Velocity', t[1:], v, 'time (s)', 'velocity (m/s)')
        
     self._data_handler.run()

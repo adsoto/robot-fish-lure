@@ -8,6 +8,9 @@ from positions_in_tank import *
 from make_traj_pts import straight_traj, rot_traj
 import time
 
+v_rect = 0.05
+v_diagonal = 0.08
+
 
 def get_traj_function(X_r, X_f, current_traj):
    """gets the next trajectory of the lure based on the current position of the lure, the fish and the current trajectory"""
@@ -81,27 +84,34 @@ def get_traj_function(X_r, X_f, current_traj):
            print('evading from A')
            # # A->C
            dist = C_rob_dist
-           new_traj = straight_traj(dist, 0.08, curr_time, rob_pos, 0) # dart diag. across tank
+           theta = np.arctan2((C_y - rob_y), (C_x - rob_x))
+           new_traj = straight_traj(dist, v_diagonal, curr_time, rob_pos, theta) # dart diag. across tank
            return new_traj
        else: # fish not close. contine wander mode
            #A->B
            print('continuing A to B')
            dist = B_rob_dist
-           new_traj = straight_traj(dist, 0.05, curr_time, rob_pos, 0)
+           theta = np.arctan2((B_y - rob_y), (B_x - rob_x))
+           new_traj = straight_traj(dist, v_rect, curr_time, rob_pos, theta)
            return new_traj
        # same code format for checking robot at pts B, C, D
        # # if at pos B
    elif B_rob_dist <= radius_about_pt:
+       print("within B")
        # if fish close
        if robot2fish <= fish_alert_radius:
+           print("fish in B - evade to D")
        # B->D
            dist = D_rob_dist
-           new_traj = straight_traj(dist, 0.05, curr_time, rob_pos, 0) # dart diag. across tank
+           theta = np.arctan2((D_y - rob_y), (B_x - rob_x))
+           new_traj = straight_traj(dist, v_diagonal, curr_time, rob_pos, theta) # dart diag. across tank
            return new_traj
        else: # fish not close
            #B->C
+           print("no fish in B - continue to C")
            dist = C_rob_dist
-           new_traj = straight_traj(dist, 0.05, curr_time, rob_pos, 0)
+           theta = np.arctan2((C_y - rob_y), (C_x - rob_x))
+           new_traj = straight_traj(dist, v_rect, curr_time, rob_pos, theta)
            return new_traj
            # if at pos C
    elif C_rob_dist <= radius_about_pt:
@@ -109,12 +119,14 @@ def get_traj_function(X_r, X_f, current_traj):
        if robot2fish <= fish_alert_radius:
        # C->A
            dist = A_rob_dist
-           new_traj = straight_traj(dist, 0.05, curr_time, rob_pos, 0) # dart diag. across tank
+           theta = np.arctan2((A_y - rob_y), (A_x - rob_x))
+           new_traj = straight_traj(dist, v_diagonal, curr_time, rob_pos, theta) # dart diag. across tank
            return new_traj
        else: # fish not close
            #C->D
            dist = D_rob_dist
-           new_traj = straight_traj(dist, 0.05, curr_time, rob_pos, 0)
+           theta = np.arctan2((D_y - rob_y), (D_x - rob_x))
+           new_traj = straight_traj(dist, v_rect, curr_time, rob_pos, theta)
            return new_traj
        # if at pos D
    elif D_rob_dist <= radius_about_pt:
@@ -122,13 +134,16 @@ def get_traj_function(X_r, X_f, current_traj):
        if robot2fish <= fish_alert_radius:
        # D->B
            dist = B_rob_dist
-           new_traj = straight_traj(dist, 0.05, curr_time, rob_pos, 0) # dart diag. across tank
+           theta = np.arctan2((B_y - rob_y), (B_x - rob_x))
+           new_traj = straight_traj(dist, v_diagonal, curr_time, rob_pos, theta) # dart diag. across tank
            return new_traj
-   else: # fish not close
-       #D->A
-       dist = A_rob_dist
-       new_traj = straight_traj(dist, 0.05, curr_time, rob_pos, 0)
-       return new_traj
+       else: # fish not close
+           print("continuing from D to A")
+           #D->A
+           dist = A_rob_dist
+           theta = np.arctan2((A_y - rob_y), (A_x - rob_x))
+           new_traj = straight_traj(dist, v_rect, curr_time, rob_pos, theta)
+           return new_traj
 
 
 

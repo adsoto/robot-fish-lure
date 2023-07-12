@@ -1,7 +1,7 @@
 # gain constants
 K_R = 1
-K_A = 1.5 #3 # 1.7 gain improves the overshoot during turns 
-K_B = 0 #0 # desired angle tracking not implemented
+K_A = 1.5 #3 # 1.7 gain improves the overshoot during turns - tracks path forward
+K_B = 0 #0 # desired angle tracking not implemented - tracks theta 
 
 # stability criteria:
 # K_R > 0, K_B < 0, K_A - K_R > 0
@@ -48,18 +48,14 @@ def track_point(desired_state, current_state):
     deltay = desired_state.y - current_state.y
     deltax = desired_state.x - current_state.x
 
-    print("desired state from track point: ", desired_state.x, desired_state.y)
-
     # i think we will have to redo these slightly 
     # rho should be distance to?
     # need to revise lecture videos
     #r2dest = desired_coords - current_coords
     #rho = np.linalg.norm(r2dest) #is this going to work now? 
     rho = current_state.distance_to(desired_state)
-    print("rho: ", rho)
     #alpha = -theta + np.arctan2(r2dest[1], r2dest[0])
     alpha = -theta + np.arctan2(deltay, deltax) #think there is an issue with alpha - ask 
-    print("alpha: ", alpha)
     beta = theta_des - theta - alpha
     
     if alpha < -np.pi: alpha = alpha + np.pi*2 # keep alpha within -pi to pi
