@@ -232,6 +232,9 @@ class centroidTracker:
             cv2.rectangle(self._current_frame, (x, y), (x + w, y + h), (0, 255, 0), 3) # draws rectangle aroudn contours
             #print(box_id)
 
+        cv2.imshow("frame", self._current_frame)
+        cv2.waitKey(1)
+
         return fish_boxes_ids
     
     def get_fish_coords(self):
