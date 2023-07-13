@@ -38,6 +38,7 @@ def get_traj_function(X_r, X_f, current_traj):
       robot2fish = fish_alert_radius + 1
   else: # fish is present and X_f state can be found
       #print("there is a fish")
+      print("there is a fish at", X_f.x, X_f.y)
       robot2fish = X_r.distance_to(X_f)
       print("robot2fish:", robot2fish)
 
@@ -151,3 +152,7 @@ def get_traj_function(X_r, X_f, current_traj):
           theta = np.arctan2((A_y - D_y), (A_x - D_x))
           new_traj = straight_traj(dist, v_rect, curr_time, D, theta)
           return new_traj
+  else: # when robot is not in a waypoint range or cannot make a new trajectory, default back to pt A
+      dist = np.sqrt(np.square(A_x -rob_x) + np.square(A_y - rob_y))
+      theta = np.arctan2((A_y-rob_y), (A_x - rob_x))
+      new_traj = straight_traj(dist, v_rect, curr_time, rob_pos, theta)

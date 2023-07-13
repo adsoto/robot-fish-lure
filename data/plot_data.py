@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 #              https://stackoverflow.com/questions/44970881/matplotlib-multiple-scatter-subplots-with-shared-colour-bar
 
 ## Choose CSV file to read for plotting
-df = pd.read_csv('data/07.12.2023/14.08.csv') # read csv file from data folder. Ex: 'data/06.13.2023/13.17.csv' reads the 13.17.csv file from the 06.13.2023 subfolder inside data folder
+df = pd.read_csv('data/07.12.2023/14.27.csv') # read csv file from data folder. Ex: 'data/06.13.2023/13.17.csv' reads the 13.17.csv file from the 06.13.2023 subfolder inside data folder
 # print(df['Desired Position: y (m)'])
 # for col in df.columns:
 #     print(col)
@@ -57,15 +57,12 @@ axs2.set_ylabel('Y (m)')
 axs2.legend(['Desired Position', 'Actual Position'])
 
 ## ~~ PLOT 3: Theta and Velocity ~~
-fig2, (axs3, axs4) = plt.subplots(1, 2)
-fig2.set_size_inches(12,4)
-line1 = axs3.scatter(df['Theta vs. Time: time(s)'], df['Theta vs. Time: theta (rads)'])
+fig2,  axs4 = plt.subplots()
+#fig2.set_size_inches(12,4)
 line2 = axs4.scatter(df['Robot Velocity: time (s)'], df['Robot Velocity: velocity (m/s)'])
 
 # # set title of subplot 1
-axs3.set_title('Theta vs Time')
-axs3.set_xlabel('Time (s)')
-axs3.set_ylabel('Theta')
+
 
 # # set title of subplot 2
 axs4.set_title('Velocity vs Time')

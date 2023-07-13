@@ -72,10 +72,13 @@ class centroidTracker:
         ## Orange threshhlding for the robot to follow the orange dots
 
         lure_hsv =cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
-        lower_orange= np.array([0, 0, 130], dtype = "uint8") 
-        upper_orange= np.array([7, 255, 255], dtype = "uint8")
+        lower_lure= np.array([0, 0, 130], dtype = "uint8") 
+        upper_lure= np.array([7, 255, 255], dtype = "uint8")
+
+        #lower_lure = np.array([0, 44, 30], dtype = "uint8")
+        #upper_lure = np.array([])
     
-        lure_mask=cv2.inRange(lure_hsv,lower_orange,upper_orange)
+        lure_mask=cv2.inRange(lure_hsv,lower_lure,upper_lure)
 
         kernellure = np.ones((15,15),np.uint8)
         kernelopen = np.ones((5,5),np.uint8)
