@@ -6,7 +6,7 @@ from paths import *
 import data_handler as dh
 import matplotlib.pyplot as plt
 import video_processor as vp
-import orange as orange
+import lure as lure
 import centroidTracker 
 import object_state
 import get_traj
@@ -22,7 +22,7 @@ class Controller():
        print("initializing controller")
        self._ser = serial.Serial(transmit_port, baudrate=115200)
        self._data_handler = dh.DataHandler(plot_data, save_data)
-       self._video = orange.VideoProcessor(camera_port, camera_bounds, save_video)
+       self._video = lure.VideoProcessor(camera_port, camera_bounds, save_video)
        self._centroidTracker = centroidTracker.centroidTracker(camera_port, camera_bounds, save_video)
        self._robot_arr = []
        self._time_arr = []
