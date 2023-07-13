@@ -54,22 +54,21 @@ class VideoProcessor:
 
         ## Orange threshhlding for the robot to follow the orange dots
 
-        into_hsv =cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
-        lower_orange= np.array([0, 100, 50], dtype = "uint8")
-        upper_orange= np.array([10, 200, 255], dtype = "uint8")
-        b_mask=cv2.inRange(into_hsv,lower_orange,upper_orange)
-        orange=cv2.bitwise_and(frame,frame,mask=b_mask)
+        lure_hsv =cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
+ 
+        lower_blue = np.array([100,50,0], dtype = "uint8") 
+        upper_blue = np.array([140,255,255], dtype = "uint8")
 
-        ret,thresh_img = cv2.threshold(orange, 90, 255, cv2.THRESH_BINARY) #converts the greyscale orange mask to binary
-        greybin = cv2.cvtColor(thresh_img, cv2.COLOR_RGB2GRAY)
-        ret, bwthresh= cv2.threshold(greybin, 10, 255, cv2.THRESH_BINARY) #converts the greyscale orange mask to binary
-
-        cv2.imshow("orange thresh",thresh_img)
-        cv2.imshow("blackwhite thresh", bwthresh)
+        lure_mask=cv2.inRange(lure_hsv,lower_blue,upper_blue)
+        kernellure = np.ones((10,10),np.uint8)
+        orange_closing = cv2.morphologyEx(lure_mask, cv2.MORPH_CLOSE, kernellure)
+        orange_dilation = cv2.dilate(orange_closing, None, 1)
         
+        cv2.imshow("orange thresh",orange_dilation)
+
         if self._save_video: self._out.write(frame)
 
-        cnts = cv2.findContours(bwthresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cnts = cv2.findContours(orange_dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         cnts = cnts[0] if len(cnts) == 2 else cnts[1]
         cnts = sorted(cnts, key=cv2.contourArea, reverse=True)
 
@@ -110,11 +109,13 @@ class VideoProcessor:
     
 if __name__ == '__main__':
     camera_index = 0
-    
+    blueLureVid = r"C:\Users\ginar\Documents\robot-fish-lure\videos\bluelure1.avi"
     camera_bounds = np.array([[467, 382], [1290, 862]]) # find these with calibrate_setup.py
+    keck_camera_bounds = np.array([[575, 300], [1445, 825]]) 
+
     vp = VideoProcessor(camera_index, camera_bounds, True)
     while True:
         vp.get_coords(1)
-        vp.display()
+        #vp.display()
         if not vp.is_go(): break
     vp.cleanup()
