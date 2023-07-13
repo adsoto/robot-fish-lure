@@ -40,7 +40,7 @@ class centroidTracker:
         bf = cv2.imread(background_path, cv2.IMREAD_COLOR)
 
         self._backframe = cv2.cvtColor(bf, cv2.COLOR_BGR2HSV)
-        self._video = orange.VideoProcessor(camera_port, camera_bounds, save_video)
+        self._lure = orange.VideoProcessor(camera_port, camera_bounds, save_video)
         self._save_video = save_video
         self._height = camera_bounds[1,1]-camera_bounds[0,1]
         self._go = True # not implemented
@@ -207,7 +207,7 @@ class centroidTracker:
         ret, frame = self._cap.read()
         fishCoords = self.get_fish_coords()
 
-        [head, tail] = self._video.get_coords(2)
+        [head, tail] = self._lure.get_coords(2)
         headX, headY = head[0], head[1]
         tailX, tailY = tail[0], tail[1]
         lurePos = [((headX + tailX)/2), ((headY + tailY)/2)]
