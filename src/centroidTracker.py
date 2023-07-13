@@ -152,14 +152,14 @@ class centroidTracker:
         return sortedfishContours
 
 
-    def get_fish_coords_id(self, num_fish):
+    def get_fish_coords_id(self, fish_id):
         """Finds fish and returns centroids in size order"""
         fishCoords = []
         #print("start")
         cnts = self.get_fish_contours()
         #print(len(cnts))
         #coords = np.zeros([num_objects, 2])
-        if (len(cnts)) < num_fish: return fishCoords # if there aren't enough contours, return
+        if (len(cnts)) < fish_id: return fishCoords # if there aren't enough contours, return
 
         fishdetections = []
         for cnt in cnts:
@@ -177,12 +177,12 @@ class centroidTracker:
             cv2.putText(self._current_frame, str(id), (x, y - 15), cv2.FONT_HERSHEY_PLAIN, 1, (255, 0, 0), 2)
             cv2.rectangle(self._current_frame, (x, y), (x + w, y + h), (0, 255, 0), 3) # draws rectangle aroudn contours
             fishCoords.append(box_id)
-
-        print (fishCoords[0])
-        cv2.imshow("frame", self._current_frame)
-        cv2.waitKey(1)
-
-        return fish_boxes_ids
+        for coord in fishCoords:
+            if coord[0] == fish_id:
+                print (coord)
+                return coord
+            else:
+                print("fish out of frame")
     
     def get_fish_coords(self):
         """Finds fish and returns centroids in size order"""
@@ -202,8 +202,6 @@ class centroidTracker:
             fishCoords.append([fcX, fcY])
 
         return fishCoords
-
-    
            
     def findClosestNeighbor(self):
         ret, frame = self._cap.read()
@@ -236,42 +234,6 @@ class centroidTracker:
 
             return minDist
 
-        
-
-    def displayWindows(self):
-        #displays original video
-        ret, frame = self._cap.read()
-        self._current_frame = frame.copy()
-        if self._current_frame is not None:
-            cv2.namedWindow('fgframe', cv2.WINDOW_NORMAL)
-            #cv2.resizeWindow('fgframe', 400, 400)
-            cv2.imshow('fgframe', frame)
-            cv2.waitKey(0)
-
-    def displayPlots():
-        bgforgraph = bg_model.getBackgroundImage()
-        RGB_img = cv2.cvtColor(bgforgraph, cv2.COLOR_BGR2RGB)
-
-        fig, ax1 = plt.subplots()
-        im1 = ax1.imshow(bgforgraph)
-        ax1.plot(FxPos, FyPos, '*', linewidth=2.0)
-        plt.title('Fish Trajectory')
-        plt.ylabel('yPred (pixels)')
-        plt.xlabel('xPred (pixels)')
-        plt.savefig('fish_trajectory.png')
-        plt.show()
-
-        fig, ax2 = plt.subplots()
-        im2 = ax2.imshow(bgforgraph)
-        ax2.plot(LxPos, LyPos, '*', linewidth=2.0)
-
-        plt.title('Lure Trajectory')
-        plt.ylabel('yPred (pixels)')
-        plt.xlabel('xPred (pixels)')
-
-        plt.savefig('lure_trajectory.png')
-
-        plt.show()
 
     def is_go(self):
         return self._go
@@ -284,12 +246,12 @@ class centroidTracker:
 
 if __name__ == '__main__':
     camera_index = 0
-    foregroundpath = r"C:\Users\ginar\Documents\robot-fish-lure\videos\bluelure1.avi"
+    foregroundpath = r"C:\Users\ginar\Documents\robot-fish-lure\videos\use_for_velocities.avi"
     backgroundPath = r"C:\Users\ginar\Documents\robot-fish-lure\videos\background2.png"
     camera_bounds = np.array([[575, 300], [1445, 825]]) # find these with calibrate_setup.pyq
     ct = centroidTracker(foregroundpath, backgroundPath, camera_bounds, False)
     while True:
-        ct.get_fish_coords_id(5)
+        ct.get_fish_coords_id(0)
         if not ct.is_go(): break
 
     ct.cleanup()
