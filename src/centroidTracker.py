@@ -139,16 +139,17 @@ class centroidTracker:
     def get_fish_thresh(self):
         ret, frame = self._cap.read()
         backframe = self._backframe
-        
 
         if (not ret): 
             print("frame has nothing")
             exit(0)
+
         frame = cv2.undistort(frame, MTX, DIST, None, MTX)
         backframe = cv2.undistort(frame, MTX, DIST, None, MTX)
         frame = frame[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
         backframe = backframe[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
 
+        self._current_frame = frame.copy()
         ## puts the fish into a color mask ##
         fish_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
@@ -162,42 +163,20 @@ class centroidTracker:
             fish_upper = np.array([100,255,220], dtype = "uint8")
             
             colorfish = cv2.inRange(fish_hsv, fish_lower, fish_upper)
-            # f_mask = cv2.bitwise_and(frame,frame, mask= colorfish)
-            # #open_f_mask = cv2.morphologyEx(f_mask, cv2.MORPH_OPEN, fish_kernel_open)
-
-            # fgMask = bg_model.apply(backframe)
-            # fgMask2 = cv2.cvtColor(fgMask, cv2.COLOR_GRAY2BGR)
-            # fgMask3 = cv2.cvtColor(fgMask2, cv2.COLOR_BGR2HSV)
-       
-            # bg_opening = cv2.morphologyEx(fgMask3, cv2.MORPH_OPEN, fish_kernel_open)
-            
-            # backsub_withfish = cv2.bitwise_or(f_mask,bg_opening, mask= colorfish)
-
-            # totalsubtraction = cv2.bitwise_or(backsub_withfish,lure_thresh, mask= colorfish)
-            #fish_mask_closing = cv2.morphologyEx(colorfish, cv2.MORPH_CLOSE, fish_kernel_closed)
-            #fish_mask_closing2 = cv2.morphologyEx(fish_mask_closing, cv2.MORPH_CLOSE, fish_kernel_closed)
             fish_mask_opening = cv2.morphologyEx(colorfish, cv2.MORPH_OPEN, fish_kernel_open)
             fish_mask_opening2 = cv2.morphologyEx(fish_mask_opening, cv2.MORPH_OPEN, fish_kernel_open)
             dilation = cv2.dilate(fish_mask_opening2, fish_kernel_open, iterations= 1)
-
-            # thresh = cv2.cvtColor(dilation, cv2.COLOR_HSV2BGR)
-
-            #thresh2 = cv2.cvtColor(dilation, cv2.COLOR_BGR2GRAY)
-
-            #create histogram
-
-            #bwret, bwthresh = cv2.threshold(thresh2, 75, 255, cv2.THRESH_BINARY)
 
             fish_cnts, hierarchy = cv2.findContours(dilation, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
             sortedfishContours = sorted(fish_cnts, key=cv2.contourArea, reverse=True)
 
             print(len(sortedfishContours))
 
-            cv2.imshow("frame", colorfish)
-            cv2.imshow("fish", dilation)
-            cv2.waitKey(0)
+            # cv2.imshow("frame", colorfish)
+            # cv2.imshow("fish", dilation)
+            # cv2.waitKey(0)
     
-            return None
+            return dilation
 
         if sc.setup == "LAIR":
             fishkernel = np.ones((5,5),np.uint8)
