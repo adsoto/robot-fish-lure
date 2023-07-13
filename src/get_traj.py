@@ -16,8 +16,6 @@ def get_traj_function(X_r, X_f, current_traj):
 
   curr_time = X_r.t
   rob_pos = [X_r.x, X_r.y]
-  if X_f:
-    fish_pos = [X_f.x, X_f.y]
   radius_about_pt = 0.05  # 5 cm
   fish_alert_radius = 0.08  # 8 cm
   curr_theta = X_r.theta
@@ -64,12 +62,18 @@ def get_traj_function(X_r, X_f, current_traj):
   A_D_dist = np.sqrt(np.square(D_y - A_y) + np.square(D_x - A_x))
 
   # lure not done with current trajectory
-  if curr_time < current_traj[-1][0]:
+  last_traj_x = current_traj[-1][1]
+  last_traj_y = current_traj[-1][2]
+  rob_to_last_traj_dist = np.sqrt(np.square(last_traj_y - rob_y) + np.square(last_traj_x - rob_x))
+  
+  # returns current trajectory if the robot has not reachd the final trajectory pt time or the final trajectory pt position
+  if curr_time < current_traj[-1][0] or rob_to_last_traj_dist > radius_about_pt: 
       print("continue on current traj")
       return current_traj
+      
   # lure done w current trajectory:
   # lure at point A and done with the current trajectory --> needs new traj
-  if A_rob_dist <= radius_about_pt:
+  elif A_rob_dist <= radius_about_pt:
       print('in A')
       # if fish close
       if robot2fish <= fish_alert_radius:
