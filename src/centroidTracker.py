@@ -8,7 +8,7 @@ import os
 from tracker import *
 import convert as c
 import setupcontrol as sc
-import orange as orange
+import lure as lure
 
 PIX2METERS = .635/820 # meters/pixels conversion
 FPS = 10
@@ -40,7 +40,7 @@ class centroidTracker:
         bf = cv2.imread(background_path, cv2.IMREAD_COLOR)
 
         self._backframe = cv2.cvtColor(bf, cv2.COLOR_BGR2HSV)
-        self._lure = orange.VideoProcessor(camera_port, camera_bounds, save_video)
+        self._lure = lure.VideoProcessor(camera_port, camera_bounds, save_video)
         self._save_video = save_video
         self._height = camera_bounds[1,1]-camera_bounds[0,1]
         self._go = True # not implemented
@@ -233,6 +233,14 @@ class centroidTracker:
             #cv2.circle(self._current_frame, closestFishCoords, 3, [255,0,0])
 
             return minDist
+        
+    def get_closest_fish_state(self, t):
+
+        fish_pos = self.findClosestNeighbor()
+
+        if fish_pos:
+            closest_fish_state = object_state.Object(t, fish_pos[0], fish_pos[1], 0) #theta is 0 for now?? how to calculate this? same as lure?
+            return closest_fish_state
 
 
     def is_go(self):
