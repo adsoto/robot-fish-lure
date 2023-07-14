@@ -36,12 +36,12 @@ filename = str(now[0:19])
 # writes video to save -- filename, fourcc, framerate, size of video 
 result = cv2.VideoWriter(filename +".avi",cv2.VideoWriter_fourcc(*'MJPG'), 30, size)
 	
-bounds = np.array([[595,  331], [1425, 801]])
+bounds = np.array([[687, 396], [1483, 801]])
 
 while(True):
 	ret, frame = video.read()
 	frame = cv2.undistort(frame, MTX, DIST, None, MTX)
-	frame = frame[bounds[0][1]:bounds[1][1], bounds[0][0]:bounds[1][0]]
+	#frame = frame[bounds[0][1]:bounds[1][1], bounds[0][0]:bounds[1][0]]
         
 	if ret == True:
 

@@ -4,7 +4,7 @@ import numpy as np
 
 start_pos = np.array([0,0])
 start_time = 0
-dt = 0.5
+dt = 0.1
 start_theta = 0
 
 

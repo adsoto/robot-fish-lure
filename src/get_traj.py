@@ -111,7 +111,7 @@ def get_traj_function(X_r, X_f, current_traj):
           print("fish in B - evade to D")
       # B->D
           dist = B_D_dist
-          theta = np.arctan2((D_y - B_y), (B_x - B_x))
+          theta = np.arctan2((D_y - B_y), (D_x - B_x))
           new_traj = straight_traj(dist, v_diagonal, curr_time, B, theta) # dart diag. across tank
           return new_traj
       else: # fish not close

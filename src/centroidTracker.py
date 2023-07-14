@@ -8,6 +8,7 @@ import os
 from tracker import *
 import convert as c
 import object_state
+import lure as lure
 
 PIX2METERS = .635/820 # meters/pixels conversion
 FPS = 10
@@ -37,6 +38,7 @@ class centroidTracker:
         self._cap = cv2.VideoCapture(camera_port)
         self._save_video = save_video
         self._height = camera_bounds[1,1]-camera_bounds[0,1]
+        self._lure = lure.VideoProcessor(camera_port, camera_bounds, save_video)
         self._go = True # not implemented
         self._current_frame = None
         self._bounds = camera_bounds
@@ -225,7 +227,7 @@ class centroidTracker:
         ret, frame = self._cap.read()
         fishCoords = self.get_fish_coords()
 
-        [head, tail] = self.get_lure_coords(2)
+        [head, tail] = self._lure.get_coords(2)
         headX, headY = head[0], head[1]
         tailX, tailY = tail[0], tail[1]
         #print("headX: ", headX)
@@ -267,14 +269,12 @@ class centroidTracker:
     def get_closest_fish_state(self, t):
 
         fish_pos = self.findClosestNeighbor()
+        frame_height = self._height
+        frame_height_m = c.ypxtomet(frame_height)
 
         if fish_pos:
-            closest_fish_state = object_state.Object(t, fish_pos[0], fish_pos[1], 0) #theta is 0 for now?? how to calculate this? same as lure?
+            closest_fish_state = object_state.Object(t, fish_pos[0]-0.05, fish_pos[1]-frame_height_m, 0) #theta is 0 for now?? how to calculate this? same as lure?
             return closest_fish_state
-
-   
-
-        
         
     def displayWindows(self):
         #displays original video
@@ -363,9 +363,9 @@ if __name__ == '__main__':
     
     #cap = cv2.VideoCapture(foregroundPath)
     #ret, frame = cap.read()
-    camera_bounds = np.array([[590, 331], [1430, 801]]) # find these with calibrate_setup.py
+    camera_bounds = np.array([[687, 396], [1483, 801]]) # find these with calibrate_setup.py
     ct = centroidTracker(camera_index, camera_bounds, False)
-    ct.displayWindows()
+    #ct.displayWindows()
     while True:
         #ct.get_coords(1)
         #ct.displayWindows()
