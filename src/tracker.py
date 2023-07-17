@@ -1,13 +1,14 @@
 import math
 
-
 class EuclideanDistTracker:
     def __init__(self):
         # Store the center positions of the objects
         self.center_points = {}
+        self.old_center_points = {}
+        self.totalData = []
         # Keep the count of the IDs
         # each time a new object id detected, the count will increase by one
-        self.id_count = 0
+        self.id_count = 1
 
 
     def update(self, objects_rect):
@@ -31,9 +32,10 @@ class EuclideanDistTracker:
                     objects_bbs_ids.append([x, y, w, h, id])
                     same_object_detected = True
                     break
-
+            #print(self.center_points)
             # New object is detected we assign the ID to that object
             if same_object_detected is False:
+                
                 self.center_points[self.id_count] = (cx, cy)
                 objects_bbs_ids.append([x, y, w, h, self.id_count])
                 self.id_count += 1
@@ -47,9 +49,31 @@ class EuclideanDistTracker:
 
         # Update dictionary with IDs not used removed
         self.center_points = new_center_points.copy()
-        sorted_pbjects_bbs_ids = sorted(objects_bbs_ids, key=lambda x: x[4]) 
-        #print(sorted_pbjects_bbs_ids)
-        return objects_bbs_ids
+        sorted_objects_bbs_ids = sorted(objects_bbs_ids, key=lambda x: x[4]) 
+        #print(sorted_objects_bbs_ids)
+        #print(new_center_points)
+        print (self.collectData())
+        return sorted_objects_bbs_ids
+    
+    def collectData(self):
+        if len(self.totalData) == 0: # initialize totalData list
+            for id, pt in self.center_points.items():
+                self.totalData.append([id, [(pt[0], pt[1])]])
+                
+        else:
+            
+            for id, pt in self.center_points.items():
+                for elem in self.totalData:
+                    if id == elem[0]:
+                        #print("elem[0]", elem[1])
+                        elem[1].append((pt[0], pt[1]))
+                        pass
+
+        return self.totalData
 
 
+if __name__ == '__main__':
+    edt = EuclideanDistTracker()
+    edt.update([[1,2,1,1], [50, 40, 1, 1], [300,400,1,1]])
+    edt.update([[10, 11, 1, 1], [305,405,1,1]])
 
