@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 #              https://stackoverflow.com/questions/44970881/matplotlib-multiple-scatter-subplots-with-shared-colour-bar
 
 ## Choose CSV file to read for plotting
-df = pd.read_csv('data/07.14.2023/11.32.csv') # read csv file from data folder. Ex: 'data/06.13.2023/13.17.csv' reads the 13.17.csv file from the 06.13.2023 subfolder inside data folder
+df = pd.read_csv('data/07.17.2023/16.28.csv') # read csv file from data folder. Ex: 'data/06.13.2023/13.17.csv' reads the 13.17.csv file from the 06.13.2023 subfolder inside data folder
 # print(df['Desired Position: y (m)'])
 # for col in df.columns:
 #     print(col)
@@ -90,3 +90,4 @@ axs5.set_ylabel('theta (rad)')
 #axs5.set_xlim(0, 0.6)
 
 plt.show()
+print(df)

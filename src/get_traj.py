@@ -14,9 +14,6 @@ import time
 v_rect = 0.05
 v_diagonal = 0.08
 
-
-
-
 def get_traj_function(X_r, X_f, current_traj):
   """gets the next trajectory of the lure based on the current position of the lure, the fish and the current trajectory"""
   # robot state: [time, x, y, theta]
@@ -26,7 +23,7 @@ def get_traj_function(X_r, X_f, current_traj):
   rob_pos = [X_r.x, X_r.y]
   if X_f:
       fish_pos = [X_f.x, X_f.y]
-  radius_about_pt = 0.05 # 5 cm
+  radius_about_pt = 0.1 # 5 cm
   fish_alert_radius = 0.08 # 8 cm
   theta = 0; # desired theta currently defaulting to 0
   # start_time initialized in c.run = gloabl computer time = wonky number

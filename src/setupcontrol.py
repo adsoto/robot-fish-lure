@@ -3,7 +3,7 @@ import numpy as np
 from paths import *
 
 global setup
-setup = "LAIR"
+setup = "KECK"
 
 global bounds # find these with calibrate_setup.py
 #LAIR: [ 687  396][1483  801]

@@ -1,6 +1,6 @@
 # gain constants
-K_R = 1
-K_A = 1.5 #3 # 1.7 gain improves the overshoot during turns - tracks path forward
+K_R = 0.7
+K_A = 1.2 #3 # 1.7 gain improves the overshoot during turns - tracks path forward
 K_B = -0.1 #0 # desired angle tracking not implemented - tracks theta 
 
 # stability criteria:
@@ -63,10 +63,10 @@ def track_point(desired_state, current_state):
     if beta < -np.pi: beta = beta + np.pi*2 # keep beta within -pi to pi
     elif beta >  np.pi: beta = beta - np.pi*2
 
-        ### edits: point turns if robot within waypoint radius
-    K_rot = 1.2 # 1.5 csv:15.39, # 1 csv: 
+        ## edits: point turns if robot within waypoint radius
+    K_rot = 0.3 # 1.5 csv:15.39, # 1 csv: 
     wypt_radius = 0.03 # _ cm 
-    accep_angle_error = 0.005 #radian 
+    accep_angle_error = 0.3 #radian 
     curr_to_des_dist = np.sqrt(np.square(deltay) + np.square(deltax))
 
     # checks if robot is near waypoint and if angle error is larger than desired ---> if yes, results in point turn
@@ -79,7 +79,7 @@ def track_point(desired_state, current_state):
         v = K_R*rho
         w = K_A*alpha + K_B*beta
 
-    # proportional control
+    # #proportional control
     # v = K_R*rho
     # w = K_A*alpha + K_B*beta
 

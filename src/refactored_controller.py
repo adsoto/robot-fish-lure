@@ -12,13 +12,16 @@ import object_state
 import get_traj
 import make_traj_pts
 from positions_in_tank import *
+import os
+from datetime import datetime
+
 
 
 class Controller():
    """Top-level class to run the robotic fish"""
 
    def __init__(self, plot_data=True, save_data=True, camera_port=0, camera_bounds = np.array([[420, 365], [1340, 905]]),
-                save_video=False, transmit_port='/dev/tty.usbmodem1402'):
+                save_video=True, transmit_port='/dev/tty.usbmodem1402'):
        print("initializing controller")
        self._ser = serial.Serial(transmit_port, baudrate=115200)
        self._data_handler = dh.DataHandler(plot_data, save_data)
@@ -40,13 +43,13 @@ class Controller():
 
    def find_target(self, traj, t):
        """Finds the next target in the path for the bot to track"""
-       dt = 0.5 #is this still what we want? 
+       dt = 0.3 #is this still what we want? 
        X_r = self._video.get_robot_state(t) #in orange, do we even need this in here though?
        final_pos = [traj[len(traj)-1][1], traj[len(traj)-1][2]]
        ttrack = t+dt
        for i in range(1, len(traj)):
            #print('entered0')
-           print("ttrack:",ttrack)
+           #print("ttrack:",ttrack)
            if traj[i-1][0] <= ttrack <= traj[i][0]:
                print("entered1")
                t1 = traj[i-1][0]
@@ -73,7 +76,7 @@ class Controller():
        #initialize clock
        start_time = time.time()
        current_time = time.time() - start_time
-       max_time = 60 #change this as needed
+       max_time = 90 #change this as needed
 
 
        X_r = self._video.get_robot_state(current_time)
@@ -125,6 +128,12 @@ class Controller():
           
           self.send_commands(vRight, vLeft)
 
+          now = datetime.now()
+          data_folder = 'data/' + now.strftime("%m.%d.%Y/")
+          data_filename = 'data/' + now.strftime("%m.%d.%Y/%H.%M") + 'backup'+ '.csv'
+          if not os.path.exists(data_folder):
+              os.makedirs(data_folder)
+
 
           if self._video._go:
                #self._time_arr.append(current_time)
@@ -134,6 +143,8 @@ class Controller():
                    self._fish_arr.append(X_f)
                self._des_arr.append(X_des)
                self.send_commands(vRight, vLeft) # go as usual
+
+
           else:
                start_time = time.time() # reset start time
           self._video.display(X_des)
@@ -195,19 +206,18 @@ class Controller():
        
     self._data_handler.run()
        
-   
-   
    #should be saving on a regular interval instead of after the fact
    #after the fact is ok for now
 
 if __name__ == '__main__':
     #LAIR: [ 687  396][1483  801]
-    #LAIR2 [601, 362], [1414, 782]
+    #LAIR 7/14 [601, 362], [1414, 782]
     #keck: [570,  311], [1442, 802]
     # keck camera 2: [[ 699    9], [1204  892]][[ 140  627][1066  130]]
-    camera_bounds = np.array([[601, 362], [1414, 782]]) # find these with calibrate_setup.py
+    # keck 7/14: [ 579  317],[1419  783]
+    camera_bounds = np.array([[ 579,  317],[1419,  783]]) # find these with calibrate_setup.py
     # find these with calibrate_setup.py
-    port_t = '/dev/tty.usbmodem11302'                # find this with ls /dev/tty.usb*   Change this port as needed
+    port_t = '/dev/tty.usbmodem1102'                # find this with ls /dev/tty.usb*   Change this port as needed
     port_c = 0                                      # either 0 or 1
     c = Controller(camera_bounds = camera_bounds, camera_port = port_c, transmit_port = port_t)
     

@@ -9,6 +9,7 @@ from tracker import *
 import convert as c
 import object_state
 import lure as lure
+import setupcontrol as sc
 
 PIX2METERS = .635/820 # meters/pixels conversion
 FPS = 10
@@ -127,33 +128,68 @@ class centroidTracker:
 
     def get_fish_thresh(self):
         ret, frame = self._cap.read()
-        frame = cv2.undistort(frame, MTX, DIST, None, MTX)
-        frame = frame[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
-        
-        if (ret is None or frame is None): 
+        #backframe = self._backframe
+
+        if (not ret): 
             print("frame has nothing")
             exit(0)
+
+        frame = cv2.undistort(frame, MTX, DIST, None, MTX)
+        #backframe = cv2.undistort(backframe, MTX, DIST, None, MTX)
+        frame = frame[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
+        #backframe = backframe[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
+
+        self._current_frame = frame.copy()
+        ## puts the fish into a color mask ##
+        fish_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        
+
+        if sc.setup == "KECK":
+
+            fish_kernel_open = np.ones((3,3),np.uint8)    
+            fish_kernel_closed = np.ones((5,5),np.uint8)
+
+            fish_lower = np.array([0,35,0], dtype = "uint8")
+            fish_upper = np.array([25,255,230], dtype = "uint8")
+            
+            colorfish = cv2.inRange(fish_hsv, fish_lower, fish_upper)
+            fish_mask_opening = cv2.morphologyEx(colorfish, cv2.MORPH_OPEN, fish_kernel_open)
+            fish_mask_opening2 = cv2.morphologyEx(fish_mask_opening, cv2.MORPH_OPEN, fish_kernel_open)
+            fish_mask_closing = cv2.morphologyEx(fish_mask_opening2, cv2.MORPH_CLOSE, fish_kernel_closed)
+
+            dilation = cv2.dilate(fish_mask_opening2, fish_kernel_open, iterations= 1)
+
+
+            #colorfish = cv2.cvtColor(colorfish, cv2.COLOR_GRAY2BGR)
+            #backframe = cv2.cvtColor(backframe, cv2.COLOR_BGR2GRAY)
+
+            # inv_thresh = cv2.bitwise_not(fish_mask_closing)
+            # #ret, bgthresh = cv2.threshold(backframe, 215, 255, cv2.THRESH_BINARY)
+            # inv_bg = cv2.bitwise_not(bgthresh)
+            # backsub = cv2.bitwise_not(cv2.add(inv_thresh, inv_bg))
+
+            fish_cnts, hierarchy = cv2.findContours(dilation, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            sortedfishContours = sorted(fish_cnts, key=cv2.contourArea, reverse=True)
+            
+            #fishCount = len(sortedfishContours)
+            #cv2.imshow("frame", frame)
+            cv2.imshow("bg", fish_mask_closing)
+            #cv2.waitKey(30)
     
-        ## Orange threshhlding for the robot to follow the orange dots
+            return fish_mask_closing
 
-        kernelopen = np.ones((5,5),np.uint8)
-        kernelclosed = np.ones((5,5),np.uint8)
+        if sc.setup == "LAIR":
+            fishkernel = np.ones((5,5),np.uint8)
+            
+            fish_lower = np.array([10,40,80], dtype = "uint8")
+            fish_upper = np.array([50,120,220], dtype = "uint8")
 
-        resultimage = np.zeros((800, 800))
-        contrasted = cv2.normalize(frame, resultimage, -32, 255, cv2.NORM_MINMAX)
-        fish_hsv = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
-        
+            fish_mask = cv2.inRange(fish_hsv, fish_lower, fish_upper)
 
-        #fish_lower = np.array([40, 70, 40], np.uint8)
-        fish_lower = np.array([10,50,85], dtype = "uint8")
-        fish_upper = np.array([50,120,210], dtype = "uint8")
-        
-        fish_mask = cv2.inRange(fish_hsv, fish_lower, fish_upper) # filters out black dots
-        fish_mask_closing = cv2.morphologyEx(fish_mask, cv2.MORPH_CLOSE, kernelclosed)
-        fish_mask_opening = cv2.morphologyEx(fish_mask_closing, cv2.MORPH_OPEN, kernelopen)
-        fish_threshcopy = cv2.cvtColor(fish_mask_opening, cv2.COLOR_BGR2RGB)
-        cv2.imshow("fish_mask", fish_mask_opening)
-        return fish_mask_opening
+            fish_mask_closing = cv2.morphologyEx(fish_mask, cv2.MORPH_CLOSE, fishkernel)
+            fish_mask_opening = cv2.morphologyEx(fish_mask_closing, cv2.MORPH_OPEN, fishkernel)
+
+            return fish_mask_opening
 
     def get_fish_contours(self):
         fish_thresh = self.get_fish_thresh()
