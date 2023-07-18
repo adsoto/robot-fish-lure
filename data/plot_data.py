@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 #              https://stackoverflow.com/questions/44970881/matplotlib-multiple-scatter-subplots-with-shared-colour-bar
 
 ## Choose CSV file to read for plotting
-df = pd.read_csv('data/07.17.2023/16.28.csv') # read csv file from data folder. Ex: 'data/06.13.2023/13.17.csv' reads the 13.17.csv file from the 06.13.2023 subfolder inside data folder
+df = pd.read_csv('data/07.18.2023/11.20.csv') # read csv file from data folder. Ex: 'data/06.13.2023/13.17.csv' reads the 13.17.csv file from the 06.13.2023 subfolder inside data folder
 # print(df['Desired Position: y (m)'])
 # for col in df.columns:
 #     print(col)
@@ -63,7 +63,7 @@ axs2.legend(['Desired Position', 'Actual Position', 'Fish Position'])
 ## ~~ PLOT 3: Theta and Velocity ~~
 fig2,  axs4 = plt.subplots()
 #fig2.set_size_inches(12,4)
-line2 = axs4.scatter(df['Robot Velocity: time (s)'], df['Robot Velocity: velocity (m/s)'])
+line2 = axs4.plot(df['Robot Velocity: time (s)'], df['Robot Velocity: velocity (m/s)'])
 
 # # set title of subplot 1
 
@@ -89,5 +89,12 @@ axs5.set_ylabel('theta (rad)')
 #axs5.set_ylim(0, 0.6)
 #axs5.set_xlim(0, 0.6)
 
+
+fig4, axs6 = plt.subplots()
+line1 = axs6.scatter(df['Distance: time (s)'], df['Distance: distance (m)'])
+axs6.legend(['time (s)', 'distance (m)'])
+axs6.set_title("Distance between Robot and Closest Fish")
+axs6.set_xlabel('time (s)')
+axs6.set_ylabel('distance (m)')
+
 plt.show()
-print(df)

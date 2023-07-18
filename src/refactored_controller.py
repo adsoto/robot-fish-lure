@@ -32,6 +32,7 @@ class Controller():
        self._theta_arr = []
        self._fish_arr = []
        self._des_arr = []
+       self._distance_arr = []
 
 
    def send_commands(self, vR, vL):
@@ -76,7 +77,7 @@ class Controller():
        #initialize clock
        start_time = time.time()
        current_time = time.time() - start_time
-       max_time = 90 #change this as needed
+       max_time = 10 #change this as needed
 
 
        X_r = self._video.get_robot_state(current_time)
@@ -141,6 +142,9 @@ class Controller():
                #self._theta_arr.append(theta)
                if X_f:
                    self._fish_arr.append(X_f)
+                   rob2fish = X_r.distance_to(X_f)
+                   self._distance_arr.append(rob2fish)
+                   print(rob2fish)
                self._des_arr.append(X_des)
                self.send_commands(vRight, vLeft) # go as usual
 
@@ -174,9 +178,12 @@ class Controller():
     xfish = [pos.x for pos in self._fish_arr]
     yfish = [pos.y for pos in self._fish_arr]
 
+    distances = self._distance_arr
+
 
     self._data_handler.add_series('desired path', xdes, ydes, 'x position', 'y position')
     self._data_handler.add_series('robot position', x, y, 'x position', 'y position')
+    self._data_handler.add_series('Distance', tfish, distances, 'time (s)', 'distance (m)')
 
        ## overlay plots desired and actual position over time
     self._data_handler.add_dual_series('Position', xdes, ydes, x, y, 'x (m)', 'y (m)')
@@ -217,7 +224,7 @@ if __name__ == '__main__':
     # keck 7/14: [ 579  317],[1419  783]
     camera_bounds = np.array([[ 579,  317],[1419,  783]]) # find these with calibrate_setup.py
     # find these with calibrate_setup.py
-    port_t = '/dev/tty.usbmodem1102'                # find this with ls /dev/tty.usb*   Change this port as needed
+    port_t = '/dev/tty.usbmodem11302'                # find this with ls /dev/tty.usb*   Change this port as needed
     port_c = 0                                      # either 0 or 1
     c = Controller(camera_bounds = camera_bounds, camera_port = port_c, transmit_port = port_t)
     
