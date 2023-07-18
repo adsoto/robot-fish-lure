@@ -3,7 +3,7 @@ import setupcontrol as sc
 PIX2METERS = 0.653/820
 
 
-if sc.setup == "LAIR":
+if sc.setup == "KECK":
 
     #LAIR 
     #X DIR CONVERSTIONS
@@ -21,7 +21,7 @@ if sc.setup == "LAIR":
 
     def ypxtomet(ypix):
         yadjust = ypix - yoff # accounts for offset in px and moves origin to lower left corner or tank
-        y_met = ((yadjust/yslope) -.56 )  # adjust  origin to lower left IN METERS
+        y_met = ((yadjust/yslope) -.56)  # adjust  origin to lower left IN METERS
         return y_met
 
     def ymettopx(ymet):
@@ -47,20 +47,20 @@ if sc.setup == "KECK":
 
     def xpxtomet(xpix):
         xadjust = xpix - xoff  # accounts for offset in px - origin on the left side of the tank
-        x_met = ((xadjust/xslope) -0.04) # adjust origin to lower left IN METERS
+        x_met = ((xadjust/xslope)-.026) # adjust origin to lower left IN METERS
         return x_met
 
     def ypxtomet(ypix):
         yadjust = ypix - yoff # accounts for offset in px and moves origin to lower left corner or tank
-        y_met = abs((yadjust/yslope)-0.33)  # adjust  origin to lower left IN METERS -- absolute value is used to make y direction positive, headed towards keck sink
+        y_met = abs((yadjust/yslope))  # adjust  origin to lower left IN METERS -- absolute value is used to make y direction positive, headed towards keck sink
         return y_met
 
     def ymettopx(ymet):
-        y_px = (ymet + 0.33) * yslope 
+        y_px = (ymet) * yslope 
         yadjust = y_px + yoff
         return yadjust
 
     def xmettopx(xmet):
-        x_px = (xmet + 0.04) * xslope
+        x_px = (xmet + 0.026) * xslope
         xadjust = x_px + xoff
         return xadjust

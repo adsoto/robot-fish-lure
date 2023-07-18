@@ -6,10 +6,11 @@ import math
 from datetime import datetime
 import os
 from tracker import *
-import convert as c
+import convert as convert
 import object_state
 import lure as lure
 import setupcontrol as sc
+
 
 PIX2METERS = .635/820 # meters/pixels conversion
 FPS = 10
@@ -111,20 +112,23 @@ class centroidTracker:
             return sorted_lure_cnts[0:num_objects]
 
 
-    def get_lure_coords(self, numObj):
-        lureCoords = []
-        cnts = self.get_lure_contours(numObj)
-        if len(cnts) == 0: return lureCoords # if there aren't enough contours, return
-        for f in cnts:
-            LM = cv2.moments(f)
-            if LM["m00"] != 0:
-                lcX = int(LM["m10"] / LM["m00"])
-                lcY = int(LM["m01"] / LM["m00"])
-            else: 
-                lcX, lcY = 0, 0
-            lureCoords.append([lcX, lcY])
+    # def get_lure_coords(self, numObj):
+    #     lureCoords = []
+    #     cnts = self.get_lure_contours(numObj)
+    #     if len(cnts) == 0: return lureCoords # if there aren't enough contours, return
+    #     for f in cnts:
+    #         LM = cv2.moments(f)
+    #         if LM["m00"] != 0:
+    #             lcX = int(LM["m10"] / LM["m00"])
+    #             lcY = int(LM["m01"] / LM["m00"])
 
-        return lureCoords
+    #             lc
+
+    #         else: 
+    #             lcX, lcY = 0, 0
+    #         lureCoords.append([lcX, lcY])
+
+    #     return lureCoords
 
     def get_fish_thresh(self):
         ret, frame = self._cap.read()
@@ -243,13 +247,15 @@ class centroidTracker:
             FM = cv2.moments(f)
             if FM["m00"] != 0:
                 fcX = int(FM["m10"] / FM["m00"])
-                fcY = int(FM["m01"] / FM["m00"])
+                fcY = int(FM["m01"] / FM["m00"]) - self._height # subtract off height in pixels here
                 
+                fcX_met = convert.xpxtomet(fcX)
+                fcY_met = convert.ypxtomet(fcY)
             else: 
                 fcX, fcY = 0, 0
             #print(str(fcX))
             #cv2.circle(self._current_frame, (fcX, fcY), 3, (320, 159, 22), -1)
-            fishCoords.append([fcX, fcY])
+            fishCoords.append([fcX_met, fcY_met])
             #FxPos += [fcX]
             #FyPos += [fcY]
             #print(fishCoords)
@@ -270,15 +276,15 @@ class centroidTracker:
         lurePos = [((headX + tailX)/2), ((headY + tailY)/2)]
         #cv2.circle(frame, lurePos, 10, (0, 0, 255), -1)
         
-        # CONVERSIONS #
-        for f in fishCoords:
-            f[0] = c.xpxtomet(int(f[0]))
-            f[1] = c.ypxtomet(int(f[1]))
-        # for l in lurePos:
-        #     l[0] = c.xpxtomet(int(l[0]))
-        #     l[1] = c.ypxtomet(int(l[1]))
-        lurePos[0] = c.xpxtomet(int(lurePos[0]))
-        lurePos[1] = c.ypxtomet(int(lurePos[1]))
+        # # CONVERSIONS #
+        # for f in fishCoords:
+        #     f[0] = c.xpxtomet(int(f[0]))
+        #     f[1] = c.ypxtomet(int(f[1]))
+        # # for l in lurePos:
+        # #     l[0] = c.xpxtomet(int(l[0]))
+        # #     l[1] = c.ypxtomet(int(l[1]))
+        # lurePos[0] = c.xpxtomet(int(lurePos[0]))
+        # lurePos[1] = c.ypxtomet(int(lurePos[1]))
 
 
         
@@ -306,10 +312,11 @@ class centroidTracker:
 
         fish_pos = self.findClosestNeighbor()
         frame_height = self._height
-        frame_height_m = c.ypxtomet(frame_height)
+        frame_height_m = convert.ypxtomet(frame_height)
 
         if fish_pos:
-            closest_fish_state = object_state.Object(t, fish_pos[0]-0.05, fish_pos[1]-frame_height_m, 0) #theta is 0 for now?? how to calculate this? same as lure?
+            closest_fish_state = object_state.Object(t, fish_pos[0], fish_pos[1], 0) #theta is 0 for now?? how to calculate this? same as lure?
+            #fix this too 
             return closest_fish_state
         
     def displayWindows(self):
@@ -326,11 +333,11 @@ class centroidTracker:
         self._current_frame = cv2.undistort(frame, MTX, DIST, None, MTX)
         self._current_frame = frame[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
         
-        lurex = c.xmettopx(closestlist[0][0])
-        lurey = c.ymettopx(closestlist[0][1])
+        lurex = convert.xmettopx(closestlist[0][0])
+        lurey = convert.ymettopx(closestlist[0][1])
 
-        closestfishx = c.xmettopx(closestlist[1][0])
-        closestfishy = c.ymettopx(closestlist[1][1])
+        closestfishx = convert.xmettopx(closestlist[1][0])
+        closestfishy = convert.ymettopx(closestlist[1][1])
 
         print(closestfishx, closestfishy)
 

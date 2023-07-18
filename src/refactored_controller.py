@@ -77,7 +77,7 @@ class Controller():
        #initialize clock
        start_time = time.time()
        current_time = time.time() - start_time
-       max_time = 10 #change this as needed
+       max_time = 60 #change this as needed
 
 
        X_r = self._video.get_robot_state(current_time)
@@ -152,6 +152,10 @@ class Controller():
           else:
                start_time = time.time() # reset start time
           self._video.display(X_des)
+          if X_r:
+              self._video.display(X_r)
+          if X_f:
+              self._video.display(X_f)
 
 
    def end(self):
@@ -224,7 +228,7 @@ if __name__ == '__main__':
     # keck 7/14: [ 579  317],[1419  783]
     camera_bounds = np.array([[ 579,  317],[1419,  783]]) # find these with calibrate_setup.py
     # find these with calibrate_setup.py
-    port_t = '/dev/tty.usbmodem11302'                # find this with ls /dev/tty.usb*   Change this port as needed
+    port_t = '/dev/tty.usbmodem1102'                # find this with ls /dev/tty.usb*   Change this port as needed
     port_c = 0                                      # either 0 or 1
     c = Controller(camera_bounds = camera_bounds, camera_port = port_c, transmit_port = port_t)
     

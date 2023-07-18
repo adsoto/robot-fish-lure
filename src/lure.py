@@ -3,6 +3,7 @@ import cv2
 import os
 from datetime import datetime
 import object_state
+import convert as convert
 
 PIX2METERS = .635/820 # meters/pixels conversion TODO: automate this calculation in __init__
 FPS = 10
@@ -86,10 +87,14 @@ class VideoProcessor:
                 cX = int(M["m10"] / M["m00"])
                 cY = int(M["m01"] / M["m00"])
             else: cX, cY = 0, 0
+
+            cX_met = convert.xpxtomet(cX)
+            cY_met = convert.ypxtomet(cY)
+
             cv2.circle(self._current_frame, (cX, cY), int(5/(i+1)), (320, 159, 22), -1)
-            coords[i,:] = np.array([cX, cY])
-        coords[:,1] = self._height - coords[:,1] # move origin to lower left corner
-        return coords*PIX2METERS
+            coords[i,:] = np.array([cX_met, cY_met])
+        coords[:,1] = (convert.ypxtomet(self._height)) - coords[:,1] # move origin to lower left corner
+        return coords
     
     def get_robot_state(self, t):
         [head, tail] = self.get_coords(2)
