@@ -21,7 +21,7 @@ class Controller():
    """Top-level class to run the robotic fish"""
 
    def __init__(self, plot_data=True, save_data=True, camera_port=0, camera_bounds = np.array([[420, 365], [1340, 905]]),
-                save_video=True, transmit_port='/dev/tty.usbmodem1402'):
+                save_video=True, transmit_port='/dev/tty.usbmodem14102'):
        print("initializing controller")
        self._ser = serial.Serial(transmit_port, baudrate=115200)
        self._data_handler = dh.DataHandler(plot_data, save_data)
@@ -151,11 +151,12 @@ class Controller():
 
           else:
                start_time = time.time() # reset start time
+          
           self._video.display(X_des)
-          if X_r:
-              self._video.display(X_r)
-          if X_f:
-              self._video.display(X_f)
+          #if X_r:
+           #   self._video.display(X_r)
+          #if X_f:
+              #self._video.display(X_f)
 
 
    def end(self):
@@ -228,7 +229,7 @@ if __name__ == '__main__':
     # keck 7/14: [ 579  317],[1419  783]
     camera_bounds = np.array([[ 579,  317],[1419,  783]]) # find these with calibrate_setup.py
     # find these with calibrate_setup.py
-    port_t = '/dev/tty.usbmodem1102'                # find this with ls /dev/tty.usb*   Change this port as needed
+    port_t = '/dev/tty.usbmodem14102'                # find this with ls /dev/tty.usb*   Change this port as needed
     port_c = 0                                      # either 0 or 1
     c = Controller(camera_bounds = camera_bounds, camera_port = port_c, transmit_port = port_t)
     

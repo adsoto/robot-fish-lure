@@ -48,6 +48,7 @@ class VideoProcessor:
         """Finds the n largest dark objects and returns their centroids in order"""
 
         coords = np.zeros([num_objects, 2])
+        coords_px = np.zeros([num_objects, 2])
         ret, frame = self._cap.read()
 
         frame = cv2.undistort(frame, MTX, DIST, None, MTX)
@@ -88,12 +89,24 @@ class VideoProcessor:
                 cY = int(M["m01"] / M["m00"])
             else: cX, cY = 0, 0
 
+            coords_px[i,:] = np.array([cX, cY])
+
+
+
             cX_met = convert.xpxtomet(cX)
             cY_met = convert.ypxtomet(cY)
 
             cv2.circle(self._current_frame, (cX, cY), int(5/(i+1)), (320, 159, 22), -1)
             coords[i,:] = np.array([cX_met, cY_met])
         coords[:,1] = (convert.ypxtomet(self._height)) - coords[:,1] # move origin to lower left corner
+
+        [head_px, tail_px] = coords_px
+        fish_vect_px = head_px - tail_px
+        theta_px = np.arctan2(fish_vect_px[1], fish_vect_px[0])
+        robot_pos_px = (head_px + tail_px)/2
+        cv2.circle(self._current_frame, (int(robot_pos_px[0]), int(robot_pos_px[1])), 5, (255, 0, 0), -1)
+
+        
         return coords
     
     def get_robot_state(self, t):
@@ -110,7 +123,13 @@ class VideoProcessor:
         """Shows live video feed, plotting dots on identified objects and the bot target"""
 
         if self._current_frame is not None:
-            cv2.circle(self._current_frame, (int(target.x/PIX2METERS), int(self._height-target.y/PIX2METERS)), 5, (0, 159, 22), -1)
+
+            xpx = convert.xmettopx(target.x)
+            ypx = convert.ymettopx(target.y)
+            print("centroid in pixels",xpx, ypx)
+            cv2.circle(self._current_frame, (int(xpx), int(self._height-ypx)), 5, (0, 159, 22), -1)
+
+            # cv2.circle(self._current_frame, (int(target.x/PIX2METERS), int(self._height-target.y/PIX2METERS)), 5, (0, 159, 22), -1)
             cv2.namedWindow("output", cv2.WINDOW_NORMAL)
             resized = cv2.resize(self._current_frame, (960, 540))
             cv2.imshow('frame', resized)
