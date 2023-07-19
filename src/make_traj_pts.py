@@ -29,19 +29,11 @@ def straight_traj(dist, vel, start_time, start_pos, theta_dir): # theta_dir is t
    return wypts
 
 
-wp1= straight_traj(1.5, 0.2, start_time, start_pos, start_theta)
-print(wp1)
-# print(wp1[0][0])
-#wp2 = straight_traj(1, 0.2, start_time1, start_pos1, start_theta1)[0]
-#print(wp2)
+wp_st= straight_traj(1.5, 0.2, start_time, start_pos, start_theta)
+print(wp_st)
 
-wp2 = straight_traj(0.3845640979165634, 0.1, 0.077, start_pos,  0)
-print(wp2)
-
-
-
-### straight
-
+# wp2 = straight_traj(0.3845640979165634, 0.1, 0.077, start_pos,  0)
+# print(wp2)
 
 # waypoint format: [time, x, y, theta]
 
@@ -54,17 +46,15 @@ def rot_traj(radians, angular_vel, start_time, start_pos, current_theta):
    num_pts = round(total_t/dt)
    d_theta = dt*angular_vel
    print(num_pts)
-   final_theta = np.mod(radians,np.pi*2)
+   final_theta = np.mod(radians, np.pi*2)
    new_start_time = start_time+total_t
 
 
-   wypts = [[] for i in range(0,num_pts)]
+   wypts = [[] for i in range(0,num_pts+1)]
    for i in range(1, num_pts+1):
        new_time = start_time+i*dt
        ## if current_theta is +
        ## check when current_theta is negative
-
-
        # for CCW roatation (+ radians)
        new_theta = current_theta + i*d_theta #(radians)*(i/num_pts)
       
@@ -74,19 +64,13 @@ def rot_traj(radians, angular_vel, start_time, start_pos, current_theta):
        elif new_theta < -np.pi:
            new_theta = new_theta + np.pi*2
 
-
-       wypts[(i-1)] = [new_time, start_pos[0], start_pos[1], new_theta]
+       wypts[0] = [start_time+dt, start_pos[0], start_pos[1], current_theta]
+       wypts[(i)] = [new_time+dt, start_pos[0], start_pos[1], new_theta]
    return wypts
 
-# def connect_straight_turn(straight_turn_inputs):
-#     """user input should be a __ of straight functions or turn functions
-#     function will output the waypoints for the given straight line and turns"""
-#     for i in len(straight_turn_inputs):
-#         if 'straight' in straight_turn_inputs[i]:
+wp_rot = rot_traj(0.8, 0.1, 0, start_pos, 0)
+print(wp_rot)
 
-
-
-
-
-
-
+comb_wp = [[] for i in range(0,(len(wp_st)+len(wp_rot)))]
+comb_wp = wp_st.append(wp_rot)
+print("combined straight and rot" + str(comb_wp))

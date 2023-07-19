@@ -86,7 +86,7 @@ def get_traj_function(X_r, X_f, current_traj):
           turn_time = delta_theta/angular_vel
           rottraj= rot_traj(delta_theta, angular_vel, curr_time, rob_pos, curr_theta) #(radians, angular_vel, start_time, start_pos, current_theta):
           straighttraj = straight_traj(dist, v_diagonal, (curr_time+turn_time), A, theta)
-          new_traj = np.append(rottraj, straighttraj)
+          new_traj = straighttraj.append(rottraj)
           return new_traj
 
       else:  # fish not close. contine wander mode
@@ -98,7 +98,7 @@ def get_traj_function(X_r, X_f, current_traj):
           turn_time = delta_theta/angular_vel
           rottraj= rot_traj(delta_theta, angular_vel, curr_time, rob_pos, curr_theta) #(radians, angular_vel, start_time, start_pos, current_theta):
           straighttraj = straight_traj(dist, v_diagonal, (curr_time+turn_time), A, theta)
-          new_traj = np.append(rottraj, straighttraj)
+          new_traj = straighttraj.append(rottraj)
           return new_traj
       # same code format for checking robot at pts B, C, D
       # # if at pos B
@@ -115,7 +115,7 @@ def get_traj_function(X_r, X_f, current_traj):
           turn_time = delta_theta/angular_vel
           rottraj= rot_traj(delta_theta, angular_vel, curr_time, rob_pos, curr_theta) #(radians, angular_vel, start_time, start_pos, current_theta):
           straighttraj = straight_traj(dist, v_diagonal, (curr_time+turn_time), B, theta)
-          new_traj = np.append(rottraj, straighttraj)
+          new_traj = straighttraj.append(rottraj)
           return new_traj
       else:  # fish not close
           # B->C
@@ -126,7 +126,7 @@ def get_traj_function(X_r, X_f, current_traj):
           turn_time = delta_theta/angular_vel
           rottraj= rot_traj(delta_theta, angular_vel, curr_time, rob_pos, curr_theta) #(radians, angular_vel, start_time, start_pos, current_theta):
           straighttraj = straight_traj(dist, v_diagonal, (curr_time+turn_time), B, theta)
-          new_traj = np.append(rottraj, straighttraj)
+          new_traj = straighttraj.append(rottraj)
           return new_traj
           # if at pos C
   elif C_rob_dist <= radius_about_pt:
@@ -140,8 +140,7 @@ def get_traj_function(X_r, X_f, current_traj):
           turn_time = delta_theta/angular_vel
           rottraj= rot_traj(delta_theta, angular_vel, curr_time, rob_pos, curr_theta) #(radians, angular_vel, start_time, start_pos, current_theta):
           straighttraj = straight_traj(dist, v_diagonal, (curr_time+turn_time), C, theta)
-          new_traj = np.append(rottraj, straighttraj)
-          return new_traj
+          new_traj = straighttraj.append(rottraj)
       else:  # fish not close
           # C->D
           dist = C_D_dist
@@ -150,7 +149,7 @@ def get_traj_function(X_r, X_f, current_traj):
           turn_time = delta_theta/angular_vel
           rottraj= rot_traj(delta_theta, angular_vel, curr_time, rob_pos, curr_theta) #(radians, angular_vel, start_time, start_pos, current_theta):
           straighttraj = straight_traj(dist, v_diagonal, (curr_time+turn_time), C, theta)
-          new_traj = np.append(rottraj, straighttraj)
+          new_traj = straighttraj.append(rottraj)
           return new_traj
       # if at pos D
   elif D_rob_dist <= radius_about_pt:
@@ -164,7 +163,7 @@ def get_traj_function(X_r, X_f, current_traj):
           turn_time = delta_theta/angular_vel
           rottraj= rot_traj(delta_theta, angular_vel, curr_time, rob_pos, curr_theta) #(radians, angular_vel, start_time, start_pos, current_theta):
           straighttraj = straight_traj(dist, v_diagonal, (curr_time+turn_time), D, theta)
-          new_traj = np.append(rottraj, straighttraj)
+          new_traj = straighttraj.append(rottraj)
           return new_traj
       else:  # fish not close
           print("continuing from D to A")
@@ -175,7 +174,7 @@ def get_traj_function(X_r, X_f, current_traj):
           turn_time = delta_theta/angular_vel
           rottraj= rot_traj(delta_theta, angular_vel, curr_time, rob_pos, curr_theta) #(radians, angular_vel, start_time, start_pos, current_theta):
           straighttraj = straight_traj(dist, v_diagonal, (curr_time+turn_time), D, theta)
-          new_traj = np.append(rottraj, straighttraj)
+          new_traj = straighttraj.append(rottraj)
           return new_traj
   else:  # when robot is not in a waypoint range or cannot make a new trajectory, default back to pt A
       dist = np.sqrt(np.square(A_x - rob_x) + np.square(A_y - rob_y))
