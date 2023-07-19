@@ -6,14 +6,14 @@ from paths import *
 import data_handler as dh
 import matplotlib.pyplot as plt
 import video_processor as vp
-import orange as orange
+import lure as lure
 import centroidTracker 
 
 
 
 
 def get_robot_state(t):
-    [head, tail] = orange.get_coords(2)
+    [head, tail] = lure.get_coords(2)
     fish_vect = head - tail
     theta = np.arctan2(fish_vect[1], fish_vect[0])
     robot_pos = (head + tail)/2

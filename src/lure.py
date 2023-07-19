@@ -3,6 +3,7 @@ import cv2
 import os
 from datetime import datetime
 import object_state
+import convert as convert
 
 PIX2METERS = .635/820 # meters/pixels conversion TODO: automate this calculation in __init__
 FPS = 10
@@ -68,12 +69,16 @@ class VideoProcessor:
         orange_dilation = cv2.dilate(orange_closing, None, 1)
         
         cv2.imshow("orange thresh",orange_dilation)
+        cv2.waitKey(1)
 
         if self._save_video: self._out.write(frame)
 
-        cnts = cv2.findContours(orange_dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        cnts = cnts[0] if len(cnts) == 2 else cnts[1]
+        cnts, hierarchy = cv2.findContours(orange_dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        #cnts = cnts[0] if len(cnts) == 2 else cnts[1]
         cnts = sorted(cnts, key=cv2.contourArea, reverse=True)
+        if len(cnts) <2:
+            print("cannot detect lure")
+        cnts = cnts[0:2]
 
         if len(cnts) < num_objects: return coords # if there aren't enough contours, return
         for i in range(0, num_objects):
@@ -82,10 +87,14 @@ class VideoProcessor:
                 cX = int(M["m10"] / M["m00"])
                 cY = int(M["m01"] / M["m00"])
             else: cX, cY = 0, 0
+
+            cX_met = convert.xpxtomet(cX)
+            cY_met = convert.ypxtomet(cY)
+
             cv2.circle(self._current_frame, (cX, cY), int(5/(i+1)), (320, 159, 22), -1)
-            coords[i,:] = np.array([cX, cY])
-        coords[:,1] = self._height - coords[:,1] # move origin to lower left corner
-        return coords*PIX2METERS
+            coords[i,:] = np.array([cX_met, cY_met])
+        coords[:,1] = (convert.ypxtomet(self._height)) - coords[:,1] # move origin to lower left corner
+        return coords
     
     def get_robot_state(self, t):
         [head, tail] = self.get_coords(2)
@@ -112,7 +121,7 @@ class VideoProcessor:
                 self._go = False
     
     def is_go(self):
-        print("here")
+        #print("here")
         return self._go
 
     def cleanup(self):
@@ -124,10 +133,10 @@ class VideoProcessor:
 if __name__ == '__main__':
     camera_index = 0
     
-    camera_bounds = np.array([[467, 382], [1290, 862]]) # find these with calibrate_setup.py
+    camera_bounds = np.array([[687, 396], [1483, 801]]) # find these with calibrate_setup.py
     vp = VideoProcessor(camera_index, camera_bounds, True)
     while True:
-        vp.get_coords(1) #should this be 2?? 
-        vp.display()
+        vp.get_coords(2) #should this be 2?? 
+        #vp.display()
         if not vp.is_go(): break
     vp.cleanup()

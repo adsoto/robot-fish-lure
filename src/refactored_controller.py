@@ -6,29 +6,33 @@ from paths import *
 import data_handler as dh
 import matplotlib.pyplot as plt
 import video_processor as vp
-import orange as orange
+import lure as lure
 import centroidTracker 
 import object_state
 import get_traj
 import make_traj_pts
 from positions_in_tank import *
+import os
+from datetime import datetime
+
 
 
 class Controller():
    """Top-level class to run the robotic fish"""
 
    def __init__(self, plot_data=True, save_data=True, camera_port=0, camera_bounds = np.array([[420, 365], [1340, 905]]),
-                save_video=False, transmit_port='/dev/tty.usbmodem1402'):
+                save_video=True, transmit_port='/dev/tty.usbmodem1402'):
        print("initializing controller")
        self._ser = serial.Serial(transmit_port, baudrate=115200)
        self._data_handler = dh.DataHandler(plot_data, save_data)
-       self._video = orange.VideoProcessor(camera_port, camera_bounds, save_video)
+       self._video = lure.VideoProcessor(camera_port, camera_bounds, save_video)
        self._centroidTracker = centroidTracker.centroidTracker(camera_port, camera_bounds, save_video)
        self._robot_arr = []
        self._time_arr = []
        self._theta_arr = []
        self._fish_arr = []
        self._des_arr = []
+       self._distance_arr = []
 
 
    def send_commands(self, vR, vL):
@@ -40,13 +44,13 @@ class Controller():
 
    def find_target(self, traj, t):
        """Finds the next target in the path for the bot to track"""
-       dt = 0.5 #is this still what we want? 
+       dt = 0.3 #is this still what we want? 
        X_r = self._video.get_robot_state(t) #in orange, do we even need this in here though?
        final_pos = [traj[len(traj)-1][1], traj[len(traj)-1][2]]
        ttrack = t+dt
        for i in range(1, len(traj)):
            #print('entered0')
-           print("ttrack:",ttrack)
+           #print("ttrack:",ttrack)
            if traj[i-1][0] <= ttrack <= traj[i][0]:
                print("entered1")
                t1 = traj[i-1][0]
@@ -73,7 +77,7 @@ class Controller():
        #initialize clock
        start_time = time.time()
        current_time = time.time() - start_time
-       max_time = 30 #change this as needed
+       max_time = 60 #change this as needed
 
 
        X_r = self._video.get_robot_state(current_time)
@@ -110,7 +114,7 @@ class Controller():
           #traj_t = [[1, 0.1, 0.08, 0], [2, 0.25, 0.08, 0], [3, 0.5, 0.08, 0]]
           #put fish conditionals in get traj (is Xf null...)
 
-          print("traj: ", traj_t)
+          #print("traj: ", traj_t)
           
           X_des = self.find_target(traj_t, current_time) #update find_target as well for these inputs
 
@@ -125,17 +129,33 @@ class Controller():
           
           self.send_commands(vRight, vLeft)
 
+          now = datetime.now()
+          data_folder = 'data/' + now.strftime("%m.%d.%Y/")
+          data_filename = 'data/' + now.strftime("%m.%d.%Y/%H.%M") + 'backup'+ '.csv'
+          if not os.path.exists(data_folder):
+              os.makedirs(data_folder)
+
 
           if self._video._go:
                #self._time_arr.append(current_time)
                self._robot_arr.append(X_r)
                #self._theta_arr.append(theta)
-               self._fish_arr.append(X_f)
+               if X_f:
+                   self._fish_arr.append(X_f)
+                   rob2fish = X_r.distance_to(X_f)
+                   self._distance_arr.append(rob2fish)
+                   print(rob2fish)
                self._des_arr.append(X_des)
                self.send_commands(vRight, vLeft) # go as usual
+
+
           else:
                start_time = time.time() # reset start time
           self._video.display(X_des)
+          if X_r:
+              self._video.display(X_r)
+          if X_f:
+              self._video.display(X_f)
 
 
    def end(self):
@@ -152,24 +172,33 @@ class Controller():
     x = [pos.x for pos in self._robot_arr]
     y = [pos.y for pos in self._robot_arr]
     theta = [pos.theta for pos in self._robot_arr]
-    v = np.linalg.norm(np.diff(np.array([x, y])), axis=0)/np.diff(t) #what does this do?
-    #trajectory = trajectory1
+    v = np.linalg.norm(np.diff(np.array([x, y])), axis=0)/np.diff(t) #filter velocity data. overplot desired vs. actual. change to central velocity calculations
     xdes = [pos.x for pos in self._des_arr]
     ydes = [pos.y for pos in self._des_arr]
     tdes = [pos.t for pos in self._des_arr]
     thetades = [pos.theta for pos in self._des_arr]
 
+    tfish = [pos.t for pos in self._fish_arr]
+    xfish = [pos.x for pos in self._fish_arr]
+    yfish = [pos.y for pos in self._fish_arr]
+
+    distances = self._distance_arr
+
 
     self._data_handler.add_series('desired path', xdes, ydes, 'x position', 'y position')
     self._data_handler.add_series('robot position', x, y, 'x position', 'y position')
-       # emily commented these out
-
+    self._data_handler.add_series('Distance', tfish, distances, 'time (s)', 'distance (m)')
 
        ## overlay plots desired and actual position over time
     self._data_handler.add_dual_series('Position', xdes, ydes, x, y, 'x (m)', 'y (m)')
     self._data_handler.add_dual_series('X-Pos vs. Time', tdes, xdes, t, x, 'time(s)', "x (m)")
     self._data_handler.add_dual_series('Y-Pos vs. Time', tdes, ydes, t, y, 'time(s)', "y (m)")
     self._data_handler.add_dual_series('Theta vs. Theta Des', tdes, thetades, t, theta, 'time(s)', 'theta (rad)')
+
+        ## add plots for fish positions
+    self._data_handler.add_series('Fish Position', xfish, yfish, 'x (m)', 'y (m)')
+    self._data_handler.add_series("Fish X-Pos vs. Time", tfish, xfish, 'time (s)', 'x (m)')
+    self._data_handler.add_series("Fish Y-Pos vs. Time", tfish, yfish, 'time (s)', 'y (m)')
        
         ## add series saves raw data and then creates plots through data_handler.py
     self._data_handler.add_series('Desired Position', xdes, ydes,'x (m)', 'y (m)')
@@ -188,18 +217,18 @@ class Controller():
        
     self._data_handler.run()
        
-   
-   
    #should be saving on a regular interval instead of after the fact
    #after the fact is ok for now
 
 if __name__ == '__main__':
     #LAIR: [ 687  396][1483  801]
+    #LAIR 7/14 [601, 362], [1414, 782]
     #keck: [570,  311], [1442, 802]
-    # keck camera 2: [[ 699    9], [1204  892]]
-    camera_bounds = np.array([[590, 331], [1430, 801]]) # find these with calibrate_setup.py
+    # keck camera 2: [[ 699    9], [1204  892]][[ 140  627][1066  130]]
+    # keck 7/14: [ 579  317],[1419  783]
+    camera_bounds = np.array([[ 579,  317],[1419,  783]]) # find these with calibrate_setup.py
     # find these with calibrate_setup.py
-    port_t = '/dev/tty.usbmodem11302'                # find this with ls /dev/tty.usb*   Change this port as needed
+    port_t = '/dev/tty.usbmodem1102'                # find this with ls /dev/tty.usb*   Change this port as needed
     port_c = 0                                      # either 0 or 1
     c = Controller(camera_bounds = camera_bounds, camera_port = port_c, transmit_port = port_t)
     

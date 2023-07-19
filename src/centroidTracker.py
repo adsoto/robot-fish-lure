@@ -7,8 +7,7 @@ from datetime import datetime
 import os
 from tracker import *
 import convert as c
-import setupcontrol as sc
-import lure as lure
+import object_state
 
 PIX2METERS = .635/820 # meters/pixels conversion
 FPS = 10
@@ -43,6 +42,7 @@ class centroidTracker:
         self._lure = lure.VideoProcessor(camera_port, camera_bounds, save_video)
         self._save_video = save_video
         self._height = camera_bounds[1,1]-camera_bounds[0,1]
+        self._lure = lure.VideoProcessor(camera_port, camera_bounds, save_video)
         self._go = True # not implemented
         self._current_frame = None
         self._bounds = camera_bounds
@@ -72,71 +72,89 @@ class centroidTracker:
             exit(0)
                 
         self._current_frame = frame.copy()
+        ## Orange threshhlding for the robot to follow the orange dots
 
-        cv2.imshow("frame", frame)
-        cv2.waitKey(30)
+        lure_hsv =cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
+        lower_lure= np.array([0, 0, 130], dtype = "uint8") 
+        upper_lure= np.array([7, 255, 255], dtype = "uint8")
+
+        #lower_lure = np.array([0, 44, 30], dtype = "uint8")
+        #upper_lure = np.array([])
+    
+        lure_mask=cv2.inRange(lure_hsv,lower_lure,upper_lure)
+
+        kernellure = np.ones((15,15),np.uint8)
+        kernelopen = np.ones((5,5),np.uint8)
+
+        orange_closing = cv2.morphologyEx(lure_mask, cv2.MORPH_CLOSE, kernellure)
+        orange_opening = cv2.morphologyEx(orange_closing, cv2.MORPH_OPEN, kernelopen)
+        lure_threshcopy = cv2.cvtColor(orange_opening, cv2.COLOR_BGR2RGB)
+        # cv2.imshow("thresh", orange_opening)
+        # cv2.waitKey(0)
+        return orange_opening
+
+
+    def get_lure_contours(self, num_objects):
+        """Finds the lure and returns centroids in size order"""
+        lure_thresh = self.get_lure_thresh()
+
+        if (lure_thresh is None):
+            print("no lure")
+            exit(0)
+
+        lure_cnts = cv2.findContours(lure_thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        lure_cnts = lure_cnts[0] if len(lure_cnts) == 2 else lure_cnts[1]
+        sorted_lure_cnts = sorted(lure_cnts, key=cv2.contourArea, reverse=True)
+        if num_objects == 0:
+            return sorted_lure_cnts
+        else:
+            return sorted_lure_cnts[0:num_objects]
+
+
+    def get_lure_coords(self, numObj):
+        lureCoords = []
+        cnts = self.get_lure_contours(numObj)
+        if len(cnts) == 0: return lureCoords # if there aren't enough contours, return
+        for f in cnts:
+            LM = cv2.moments(f)
+            if LM["m00"] != 0:
+                lcX = int(LM["m10"] / LM["m00"])
+                lcY = int(LM["m01"] / LM["m00"])
+            else: 
+                lcX, lcY = 0, 0
+            lureCoords.append([lcX, lcY])
+
+        return lureCoords
 
     def get_fish_thresh(self):
         ret, frame = self._cap.read()
-        backframe = self._backframe
-
-        if (not ret): 
+        frame = cv2.undistort(frame, MTX, DIST, None, MTX)
+        frame = frame[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
+        
+        if (ret is None or frame is None): 
             print("frame has nothing")
             exit(0)
-
-        frame = cv2.undistort(frame, MTX, DIST, None, MTX)
-        backframe = cv2.undistort(frame, MTX, DIST, None, MTX)
-        frame = frame[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
-        backframe = backframe[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
-
-        self._current_frame = frame.copy()
-        ## puts the fish into a color mask ##
-        fish_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-
-        if sc.setup == "KECK":
-            #manual backsub, HSV -> morphs
-
-            fish_kernel_open = np.ones((5,5),np.uint8)    
-            fish_kernel_closed = np.ones((4,4),np.uint8)
-
-            fish_lower = np.array([0,50,115], dtype = "uint8")
-            fish_upper = np.array([100,255,220], dtype = "uint8")
-            
-            colorfish = cv2.inRange(fish_hsv, fish_lower, fish_upper)
-            fish_mask_opening = cv2.morphologyEx(colorfish, cv2.MORPH_OPEN, fish_kernel_open)
-            fish_mask_opening2 = cv2.morphologyEx(fish_mask_opening, cv2.MORPH_OPEN, fish_kernel_open)
-            dilation = cv2.dilate(fish_mask_opening2, fish_kernel_open, iterations= 1)
-
-            fish_cnts, hierarchy = cv2.findContours(dilation, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-            sortedfishContours = sorted(fish_cnts, key=cv2.contourArea, reverse=True)
-            
-            fishCount = len(sortedfishContours)
-
-            if fishCount > 10:
-                print ("fish breaking up: ", fishCount)
-            if fishCount > 10:
-                print ("fish out of frame or blending together: ", fishCount)
-
-
-            # cv2.imshow("frame", colorfish)
-            # cv2.imshow("fish", dilation)
-            # cv2.waitKey(0)
     
-            return dilation
+        ## Orange threshhlding for the robot to follow the orange dots
 
-        if sc.setup == "LAIR":
-            fishkernel = np.ones((5,5),np.uint8)
-            
-            fish_lower = np.array([10,40,80], dtype = "uint8")
-            fish_upper = np.array([50,120,220], dtype = "uint8")
+        kernelopen = np.ones((5,5),np.uint8)
+        kernelclosed = np.ones((5,5),np.uint8)
 
-            fish_mask = cv2.inRange(fish_hsv, fish_lower, fish_upper)
+        resultimage = np.zeros((800, 800))
+        contrasted = cv2.normalize(frame, resultimage, -32, 255, cv2.NORM_MINMAX)
+        fish_hsv = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
+        
 
-            fish_mask_closing = cv2.morphologyEx(fish_mask, cv2.MORPH_CLOSE, fishkernel)
-            fish_mask_opening = cv2.morphologyEx(fish_mask_closing, cv2.MORPH_OPEN, fishkernel)
-
-            return fish_mask_opening
-    
+        #fish_lower = np.array([40, 70, 40], np.uint8)
+        fish_lower = np.array([10,50,85], dtype = "uint8")
+        fish_upper = np.array([50,120,210], dtype = "uint8")
+        
+        fish_mask = cv2.inRange(fish_hsv, fish_lower, fish_upper) # filters out black dots
+        fish_mask_closing = cv2.morphologyEx(fish_mask, cv2.MORPH_CLOSE, kernelclosed)
+        fish_mask_opening = cv2.morphologyEx(fish_mask_closing, cv2.MORPH_OPEN, kernelopen)
+        fish_threshcopy = cv2.cvtColor(fish_mask_opening, cv2.COLOR_BGR2RGB)
+        cv2.imshow("fish_mask", fish_mask_opening)
+        return fish_mask_opening
 
     def get_fish_contours(self):
         fish_thresh = self.get_fish_thresh()
@@ -194,13 +212,20 @@ class centroidTracker:
             FM = cv2.moments(f)
             if FM["m00"] != 0:
                 fcX = int(FM["m10"] / FM["m00"])
-                fcY = int(FM["m01"] / FM["m00"])
+                fcY = int(FM["m01"] / FM["m00"]) - self._height # subtract off height in pixels here
                 
+                fcX_met = convert.xpxtomet(fcX)
+                fcY_met = convert.ypxtomet(fcY)
             else: 
                 fcX, fcY = 0, 0
-
+            #print(str(fcX))
+            #cv2.circle(self._current_frame, (fcX, fcY), 3, (320, 159, 22), -1)
             fishCoords.append([fcX, fcY])
-
+            #FxPos += [fcX]
+            #FyPos += [fcY]
+            #print(fishCoords)
+        #fishCoords[:,1] = self._height - fishCoords[:,1] # move origin to lower left corner
+        #print(fishCoords)
         return fishCoords
            
     def findClosestNeighbor(self):
@@ -211,12 +236,15 @@ class centroidTracker:
         headX, headY = head[0], head[1]
         tailX, tailY = tail[0], tail[1]
         lurePos = [((headX + tailX)/2), ((headY + tailY)/2)]
-
-        # PIX to METER CONVERSIONS #
+        #cv2.circle(frame, lurePos, 10, (0, 0, 255), -1)
+        
+        # CONVERSIONS #
         for f in fishCoords:
             f[0] = c.xpxtomet(int(f[0]))
             f[1] = c.ypxtomet(int(f[1]))
-
+        # for l in lurePos:
+        #     l[0] = c.xpxtomet(int(l[0]))
+        #     l[1] = c.ypxtomet(int(l[1]))
         lurePos[0] = c.xpxtomet(int(lurePos[0]))
         lurePos[1] = c.ypxtomet(int(lurePos[1]))
 
@@ -237,11 +265,89 @@ class centroidTracker:
     def get_closest_fish_state(self, t):
 
         fish_pos = self.findClosestNeighbor()
+        frame_height = self._height
+        frame_height_m = convert.ypxtomet(frame_height)
 
         if fish_pos:
             closest_fish_state = object_state.Object(t, fish_pos[0], fish_pos[1], 0) #theta is 0 for now?? how to calculate this? same as lure?
+            #fix this too 
             return closest_fish_state
 
+   
+
+        
+        
+    def displayWindows(self):
+        #displays original video
+        closestlist = ct.findClosestNeighbor()
+
+        print("lure position", closestlist[0])
+        print("closest fish", closestlist[1])
+        print("min dist", closestlist[2])
+
+        ret, frame = self._cap.read()
+        self._current_frame = frame.copy()
+    
+        self._current_frame = cv2.undistort(frame, MTX, DIST, None, MTX)
+        self._current_frame = frame[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
+        
+        lurex = c.xmettopx(closestlist[0][0])
+        lurey = c.ymettopx(closestlist[0][1])
+
+        closestfishx = c.xmettopx(closestlist[1][0])
+        closestfishy = c.ymettopx(closestlist[1][1])
+
+        print(closestfishx, closestfishy)
+
+        cv2.circle(self._current_frame, (int(lurex),int(lurey)), 7, (0, 0, 255), -1)
+        cv2.circle(self._current_frame, (int(closestfishx),int(closestfishy)), 7, (255, 0, 0), -1) ## not working, out of frame
+
+        print("lure position", closestlist[0])
+        print("closest fish", closestlist[1])
+        print("min dist", closestlist[2])
+        
+        # sortedfishContours = self.get_fish_contours
+        # lureContours = self.get_lure_contours
+        # fish_thresh = self.get_fish_thresh()
+
+        # fishContours = cv2.drawContours(fish_thresh, sortedfishContours, -1, (0,255,0), 2) 
+
+        # if fishContours is not None:# or lureContours is not None:
+        #     #allContours = cv2.add(fishContours, lureContours)
+        #     #displays blobs
+        #     cv2.namedWindow('Contours', cv2.WINDOW_NORMAL)
+        #     cv2.resizeWindow('Contours', 400, 400)
+        #     cv2.imshow('Contours', fishContours)
+        # key = cv2.waitKey(0)
+        # if key & 0xFF == ord('g'):
+        #     self._go = True
+        # elif key & 0xFF == ord('q'):
+        #     self._go = False
+
+    def displayPlots():
+        bgforgraph = bg_model.getBackgroundImage()
+        RGB_img = cv2.cvtColor(bgforgraph, cv2.COLOR_BGR2RGB)
+
+        fig, ax1 = plt.subplots()
+        im1 = ax1.imshow(bgforgraph)
+        ax1.plot(FxPos, FyPos, '*', linewidth=2.0)
+        plt.title('Fish Trajectory')
+        plt.ylabel('yPred (pixels)')
+        plt.xlabel('xPred (pixels)')
+        plt.savefig('fish_trajectory.png')
+        plt.show()
+
+        fig, ax2 = plt.subplots()
+        im2 = ax2.imshow(bgforgraph)
+        ax2.plot(LxPos, LyPos, '*', linewidth=2.0)
+
+        plt.title('Lure Trajectory')
+        plt.ylabel('yPred (pixels)')
+        plt.xlabel('xPred (pixels)')
+
+        plt.savefig('lure_trajectory.png')
+
+        plt.show()
 
     def is_go(self):
         return self._go
@@ -254,10 +360,13 @@ class centroidTracker:
 
 if __name__ == '__main__':
     camera_index = 0
-    foregroundpath = r"C:\Users\ginar\Documents\robot-fish-lure\videos\use_for_velocities.avi"
-    backgroundPath = r"C:\Users\ginar\Documents\robot-fish-lure\videos\background2.png"
-    camera_bounds = np.array([[575, 300], [1445, 825]]) # find these with calibrate_setup.pyq
-    ct = centroidTracker(foregroundpath, backgroundPath, camera_bounds, False)
+    foregroundPath = r"C:\Users\ginar\Documents\robot-fish-lure\videos\lurestill.mp4"
+    
+    #cap = cv2.VideoCapture(foregroundPath)
+    #ret, frame = cap.read()
+    camera_bounds = np.array([[590, 331], [1430, 801]]) # find these with calibrate_setup.py
+    ct = centroidTracker(camera_index, camera_bounds, False)
+    ct.displayWindows()
     while True:
         ct.get_fish_coords_id(0)
         if not ct.is_go(): break

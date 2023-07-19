@@ -13,7 +13,7 @@ from paths import *
 import data_handler as dh
 import matplotlib.pyplot as plt
 import video_processor as vp
-import orange as orange
+import lure as lure
 
 
 class Controller():
