@@ -6,8 +6,10 @@ import math
 from datetime import datetime
 import os
 from tracker import *
-import convert as c
+import convert 
 import object_state
+import lure
+
 
 PIX2METERS = .635/820 # meters/pixels conversion
 FPS = 10
@@ -34,11 +36,12 @@ hsvRanges = []
 
 class centroidTracker:
 
-    def __init__(self, camera_port, background_path, camera_bounds, save_video):
+    #def __init__(self, camera_port, background_path, camera_bounds, save_video):   **can uncomment this stuff when we get a bg for LAIR working
+    def __init__(self, camera_port, camera_bounds, save_video):
         self._cap = cv2.VideoCapture(camera_port)
-        bf = cv2.imread(background_path, cv2.IMREAD_COLOR)
+       #bf = cv2.imread(background_path, cv2.IMREAD_COLOR)
 
-        self._backframe = cv2.cvtColor(bf, cv2.COLOR_BGR2HSV)
+        #self._backframe = cv2.cvtColor(bf, cv2.COLOR_BGR2HSV)
         self._lure = lure.VideoProcessor(camera_port, camera_bounds, save_video)
         self._save_video = save_video
         self._height = camera_bounds[1,1]-camera_bounds[0,1]
@@ -240,16 +243,16 @@ class centroidTracker:
         
         # CONVERSIONS #
         for f in fishCoords:
-            f[0] = c.xpxtomet(int(f[0]))
-            f[1] = c.ypxtomet(int(f[1]))
+            f[0] = convert.xpxtomet(int(f[0]))
+            f[1] = convert.ypxtomet(int(f[1]))
         # for l in lurePos:
         #     l[0] = c.xpxtomet(int(l[0]))
         #     l[1] = c.ypxtomet(int(l[1]))
-        lurePos[0] = c.xpxtomet(int(lurePos[0]))
-        lurePos[1] = c.ypxtomet(int(lurePos[1]))
+        lurePos[0] = convert.xpxtomet(int(lurePos[0]))
+        lurePos[1] = convert.ypxtomet(int(lurePos[1]))
 
         
-        if fishCoords is not None:
+        if fishCoords:
             closestFish = fishCoords[0]
             minDist = math.dist(lurePos,closestFish)
             for fish in fishCoords:
@@ -291,11 +294,11 @@ class centroidTracker:
         self._current_frame = cv2.undistort(frame, MTX, DIST, None, MTX)
         self._current_frame = frame[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
         
-        lurex = c.xmettopx(closestlist[0][0])
-        lurey = c.ymettopx(closestlist[0][1])
+        lurex = convert.xmettopx(closestlist[0][0])
+        lurey = convert.ymettopx(closestlist[0][1])
 
-        closestfishx = c.xmettopx(closestlist[1][0])
-        closestfishy = c.ymettopx(closestlist[1][1])
+        closestfishx = convert.xmettopx(closestlist[1][0])
+        closestfishy = convert.ymettopx(closestlist[1][1])
 
         print(closestfishx, closestfishy)
 
