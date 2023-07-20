@@ -12,6 +12,7 @@ import object_state
 import get_traj
 import make_traj_pts
 from positions_in_tank import *
+import csv
 import os
 from datetime import datetime
 
@@ -130,10 +131,40 @@ class Controller():
           self.send_commands(vRight, vLeft)
 
           now = datetime.now()
-          data_folder = 'data/' + now.strftime("%m.%d.%Y/")
-          data_filename = 'data/' + now.strftime("%m.%d.%Y/%H.%M") + 'backup'+ '.csv'
+          data_folder = 'data/' + 'backup' + now.strftime("%m.%d.%Y/") 
+          print(data_folder)
+          data_filename = 'data/' + 'backup'+ now.strftime("%m.%d.%Y/%H.%M") + '.csv'
+          print(data_filename)
           if not os.path.exists(data_folder):
               os.makedirs(data_folder)
+              f = open(data_folder + data_filename, 'w')
+              writer = csv.writer(f)
+              fieldnames = ['robot states', 'fish states', 'desired states', 'distances']
+              writer.writeheader(fieldnames)
+              f.close()
+
+          if self._video._go:
+               #self._time_arr.append(current_time)
+               self._robot_arr.append(X_r)
+               #self._theta_arr.append(theta)
+               if X_f:
+                   self._fish_arr.append(X_f)
+                   rob2fish = X_r.distance_to(X_f)
+                   self._distance_arr.append(rob2fish)
+                   print(rob2fish)
+               self._des_arr.append(X_des)
+               self.send_commands(vRight, vLeft) # go as usual
+               rows = [{'robot states': X_r,
+                       'fish states': X_f,
+                       'desired states': X_des,
+                       'distances' : rob2fish
+                       }]
+               file = data_filename
+               with open(file, 'w', encoding = 'UTF8', newline='') as f:
+                   fieldnames = ['robot states', 'fish states', 'desired states', 'distances']
+                   writer = csv.DictWriter(f, fieldnames = fieldnames)
+                   writer.writerows(rows)
+
 
 
           if self._video._go:
@@ -169,6 +200,7 @@ class Controller():
     y = [pos.y for pos in self._robot_arr]
     theta = [pos.theta for pos in self._robot_arr]
     v = np.linalg.norm(np.diff(np.array([x, y])), axis=0)/np.diff(t) #filter velocity data. overplot desired vs. actual. change to central velocity calculations
+    print(np.diff(t))
     xdes = [pos.x for pos in self._des_arr]
     ydes = [pos.y for pos in self._des_arr]
     tdes = [pos.t for pos in self._des_arr]
