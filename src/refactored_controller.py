@@ -137,7 +137,7 @@ class Controller():
           print(data_filename)
           if not os.path.exists(data_folder):
               os.makedirs(data_folder)
-              f = open(data_folder + data_filename, 'w')
+              f = open(data_filename, 'w')
               writer = csv.writer(f)
               fieldnames = ['robot states', 'fish states', 'desired states', 'distances']
               writer.writeheader(fieldnames)
@@ -154,16 +154,18 @@ class Controller():
                    print(rob2fish)
                self._des_arr.append(X_des)
                self.send_commands(vRight, vLeft) # go as usual
-               rows = [{'robot states': X_r,
-                       'fish states': X_f,
-                       'desired states': X_des,
-                       'distances' : rob2fish
+               rows = [{'robot states': self._robot_arr,
+                       'fish states': self._fish_arr,
+                       'desired states': self._des_arr,
+                       'distances' : self._distance_arr
                        }]
                file = data_filename
-               with open(file, 'w', encoding = 'UTF8', newline='') as f:
+               with open(file, 'w', newline ='') as f:
                    fieldnames = ['robot states', 'fish states', 'desired states', 'distances']
                    writer = csv.DictWriter(f, fieldnames = fieldnames)
+                   writer.writeheader()
                    writer.writerows(rows)
+
 
 
 
@@ -256,7 +258,7 @@ if __name__ == '__main__':
     # keck 7/14: [ 579  317],[1419  783]
     camera_bounds = np.array([[ 579,  317],[1419,  783]]) # find these with calibrate_setup.py
     # find these with calibrate_setup.py
-    port_t = '/dev/tty.usbmodem11302'                # find this with ls /dev/tty.usb*   Change this port as needed
+    port_t = '/dev/tty.usbmodem1302'                # find this with ls /dev/tty.usb*   Change this port as needed
     port_c = 0                                      # either 0 or 1
     c = Controller(camera_bounds = camera_bounds, camera_port = port_c, transmit_port = port_t)
     

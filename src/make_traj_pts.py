@@ -29,14 +29,14 @@ def straight_traj(dist, vel, start_time, start_pos, theta_dir): # theta_dir is t
    return wypts
 
 
-wp1= straight_traj(1.5, 0.2, start_time, start_pos, start_theta)
-print(wp1)
-# print(wp1[0][0])
-#wp2 = straight_traj(1, 0.2, start_time1, start_pos1, start_theta1)[0]
-#print(wp2)
+# wp1= straight_traj(1.5, 0.2, start_time, start_pos, start_theta)
+# print(wp1)
+# # print(wp1[0][0])
+# #wp2 = straight_traj(1, 0.2, start_time1, start_pos1, start_theta1)[0]
+# #print(wp2)
 
-wp2 = straight_traj(0.3845640979165634, 0.1, 0.077, start_pos,  0)
-print(wp2)
+# wp2 = straight_traj(0.3845640979165634, 0.1, 0.077, start_pos,  0)
+# print(wp2)
 
 
 
