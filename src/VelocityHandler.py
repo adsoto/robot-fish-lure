@@ -1,12 +1,8 @@
 import pandas as pd
 import VelocityTracker as vt
-<<<<<<< HEAD
-
-=======
 from datetime import *
 import matplotlib.pyplot as plt
 import os
->>>>>>> 4ba3a2953dc79fb3070bd223a44b4cb801ad47ae
 
 class VelocityHandler:
 
