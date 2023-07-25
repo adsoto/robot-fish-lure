@@ -17,31 +17,30 @@ DIST = np.array([-3.80359934e-01,  1.49531854e-01,  2.50649988e-05,  8.39488578e
 class VideoProcessor:
     """Class to handle video processing, displaying, CV, etc."""
 
-    def __init__(self, camera_port, camera_bounds, save_video):
+    def __init__(self, camera_port, camera_bounds):
         self._cap = cv2.VideoCapture(camera_port)
-        self._save_video = save_video
+        self._save_video = True  ### CHANGE HERE!
         self._height = camera_bounds[1,1]-camera_bounds[0,1]
         self._go = True # not implemented
         self._current_frame = None
-        #self._get_coords = get_coords
         self._bounds = camera_bounds
+       
+        if self._save_video == True:        
+             size = np.diff(camera_bounds, axis=0)
+             now = str(datetime.now())
+             filename = str(now[0:19])
+             daymonthyear = datetime.now()
+             date = str(daymonthyear)
+             display = date[:10]
 
-        if save_video == True: # not tested            
-            size = np.diff(camera_bounds, axis=0)
-            now = str(datetime.now())
-            filename = str(now[0:19])
-            daymonthyear = datetime.now()
-            date = str(daymonthyear)
-            display = date[:10]
+             video_folder = 'data/' + display
+             video_filename = 'data/' + filename + '.mp4'
 
-            video_folder = 'data/' + display
-            video_filename = 'data/' + filename + '.avi'
- 
-            #result = cv2.VideoWriter(video_filename +".avi",cv2.VideoWriter_fourcc(*'MJPG'),FPS, (size[0][0],size[0][1]))
-            if not os.path.exists(video_folder):
-                os.makedirs(video_folder)
-            
-            self._out = cv2.VideoWriter(video_filename, cv2.VideoWriter_fourcc(*'MJPG'), FPS, (size[0][0],size[0][1]))
+             #result = cv2.VideoWriter(video_filename +".avi",cv2.VideoWriter_fourcc(*'MJPG'),FPS, (size[0][0],size[0][1]))
+             if not os.path.exists(video_folder):
+                 os.makedirs(video_folder)
+
+             self._out = cv2.VideoWriter(video_filename, cv2.VideoWriter_fourcc(*'MJPG'), FPS, (size[0][0],size[0][1]))
 
 
     def get_coords(self, num_objects):
@@ -153,7 +152,7 @@ if __name__ == '__main__':
     camera_index = 0
     
     camera_bounds = np.array([[687, 396], [1483, 801]]) # find these with calibrate_setup.py
-    vp = VideoProcessor(camera_index, camera_bounds, True)
+    vp = VideoProcessor(camera_index, camera_bounds)
     while True:
         vp.get_coords(2) #should this be 2?? 
         #vp.display()
