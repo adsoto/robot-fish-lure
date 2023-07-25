@@ -3,7 +3,7 @@ import setupcontrol as sc
 PIX2METERS = 0.653/820
 
 
-if sc.setup == "KECK":
+if sc.setup == "LAIR":
 
     #LAIR 
     #X DIR CONVERSTIONS
@@ -61,6 +61,6 @@ if sc.setup == "KECK":
         return yadjust
 
     def xmettopx(xmet):
-        x_px = (xmet+0.01449) * xslope
+        x_px = (xmet + 0.01449) * xslope
         xadjust = x_px + xoff
         return xadjust
