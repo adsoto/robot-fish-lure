@@ -6,11 +6,8 @@ import matplotlib.pyplot as plt
 import os
 
 class Plotter:
-
-
     def __init__(self, numfish):
         self._numfish = numfish
-
 
     def read_indivcsv(self, filename):
         df = pd.read_csv(filename) # read csv file from data folder. Ex: 'data/06.13.2023/13.17.csv' reads the 13.17.csv file from the 06.13.2023 subfolder inside data folder
@@ -34,20 +31,11 @@ if __name__ == '__main__':
     bigcsv = plotter.read_bigcsv('/Users/loaner/Downloads/total_data_set14.54 - Sheet1-2.csv')
     print(bigcsv)
 
-    # creates a smart list of how many fish we have, then creates a series of all of the things we want
+    # creates a dynamic list of how many fish we have, then creates a series of all of the things we want
     yvelaxis = plotter.allfish_axis("Yvelocity")   # creates a list of all of the Y position columns for easy graphing
     xvelaxis = plotter.allfish_axis("Xvelocity")   # same thing, in X direction
-
-    print(yvelaxis)
-    # vY versus time -- alpha is the opacity constant
    
-    bigcsv.plot.line(x="Time", y=yvelaxis, alpha=1)     # plots yvelocity versus time for all fish
-    plt.title("Y Velocity of Fish Over Time")
-    plt.xlabel("Time (sec)")
-    plt.ylabel("Velocity (m/s)")
-    plt.legend(loc='upper center', bbox_to_anchor=(1.1, 1.016), ncol=1, prop = { "size": 7})
-    plt.tight_layout()
-
+    # Plot settings for Velocity X versus time -- alpha is the opacity constant
     bigcsv.plot.line(x="Time", y=xvelaxis, alpha=1) # plots xvelocity versus time for all fish\ 
     plt.title("X Velocity of Fish Over Time")
     plt.xlabel("Time (sec)")
@@ -55,7 +43,16 @@ if __name__ == '__main__':
     plt.legend(loc='upper center', bbox_to_anchor=(1.1, 1.016), ncol=1, prop = { "size": 7})
     plt.tight_layout()
 
-    # FOR POSITIONS - overlays different lines together!
+    # Plot settings for Velocity Y versus time -- alpha is the opacity constant
+    bigcsv.plot.line(x="Time", y=yvelaxis, alpha=1)     # plots yvelocity versus time for all fish
+    plt.title("Y Velocity of Fish Over Time")
+    plt.xlabel("Time (sec)")
+    plt.ylabel("Velocity (m/s)")
+    plt.legend(loc='upper center', bbox_to_anchor=(1.1, 1.016), ncol=1, prop = { "size": 7})
+    plt.tight_layout()
+
+    # FOR POSITIONS - overlays different lines together! 
+    # cannot use a smart list function here, since each X must be plotting against its own corresponding Y
     fig, positions = plt.subplots()
     line1 = positions.plot(bigcsv['Xpositions1'], bigcsv['Ypositions1'])
     line2 = positions.plot(bigcsv['Xpositions2'], bigcsv['Ypositions2'])
@@ -68,13 +65,13 @@ if __name__ == '__main__':
     line9 = positions.plot(bigcsv['Xpositions9'], bigcsv['Ypositions9'])
     line10 = positions.plot(bigcsv['Xpositions10'], bigcsv['Ypositions10'])
     
-    # set the legend for multiple plots
-    positions.legend(['Fish1', 'Fish2', "Fish3", "Fish4", "Fish5", "Fish6", "Fish7", "Fish8", "Fish9", "Fish10"], prop = { "size": 7}, loc ="upper right")
-
-    # set title of plot
+    # Position plot settings
     positions.set_title('Postions')
+    positions.legend(['Fish1', 'Fish2', "Fish3", "Fish4", "Fish5", "Fish6", "Fish7", "Fish8", "Fish9", "Fish10"], prop = { "size": 7}, loc ="upper right")
     positions.set_xlabel('Fish X Position (m)')
     positions.set_ylabel('Fish Y Position (m)')
     positions.set_ylim(0, 0.75) # match the tank 
     positions.set_xlim(0, 0.9 ) # match the tank
-    plt.show()
+
+
+    plt.show() # displays all plots
