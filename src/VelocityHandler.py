@@ -1,5 +1,5 @@
 import pandas as pd
-import velocitytracker as vt
+import VelocityTracker as vt
 
 
 class VelocityHandler:
