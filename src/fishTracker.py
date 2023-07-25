@@ -36,7 +36,7 @@ bg_model = cv2.createBackgroundSubtractorKNN(history = 800, dist2Threshold = 255
 hsvRanges = []
 
 
-class centroidTracker:
+class fishTracker:
     if sc.setup == "KECK":
         def __init__(self, camera_port, background_path, camera_bounds):
             self._cap = cv2.VideoCapture(camera_port)
@@ -299,7 +299,7 @@ if __name__ == '__main__':
     foregroundpath = r"C:\Users\ginar\OneDrive\Documents\robot-fish-lure-code-refactor\videos\short_velocities.mp4"
     backgroundPath = r"C:\Users\ginar\OneDrive\Documents\robot-fish-lure-code-refactor\videos\background2.png"
     camera_bounds = np.array([[570,  300], [1450, 820]]) # find these with calibrate_setup.pyq
-    ct = centroidTracker(foregroundpath, backgroundPath, camera_bounds)
-    ct.getFishDict()
+    ft = fishTracker(foregroundpath, backgroundPath, camera_bounds)
+    ft.getFishDict()
 
-    ct.cleanup()
+    ft.cleanup()
