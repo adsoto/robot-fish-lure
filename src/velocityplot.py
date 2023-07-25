@@ -29,8 +29,9 @@ class Plotter:
 
 if __name__ == '__main__':
 
-    plotter = Plotter(11) # input length +1 becuase of zeor indexing
-    bigcsv = plotter.read_bigcsv('/Users/loaner/Downloads/total_data_set14.54 - Sheet1.csv')
+    plotter = Plotter(11) # input the number of fish in the video! -- input length +1 becuase of zeor indexing
+    
+    bigcsv = plotter.read_bigcsv('/Users/loaner/Downloads/total_data_set14.54 - Sheet1-2.csv')
     print(bigcsv)
 
     # creates a smart list of how many fish we have, then creates a series of all of the things we want
@@ -39,33 +40,41 @@ if __name__ == '__main__':
 
     print(yvelaxis)
     # vY versus time -- alpha is the opacity constant
-    bigcsv.plot.line(x="Time1", y=yvelaxis, alpha=1) # plots yvelocity versus time for all fish
-    bigcsv.plot.line(x="Time1", y=xvelaxis, alpha=1) # plots xvelocity versus time for all fish
-    
+   
+    bigcsv.plot.line(x="Time", y=yvelaxis, alpha=1)     # plots yvelocity versus time for all fish
+    plt.title("Y Velocity of Fish Over Time")
+    plt.xlabel("Time (sec)")
+    plt.ylabel("Velocity (m/s)")
+    plt.legend(loc='upper center', bbox_to_anchor=(1.1, 1.016), ncol=1, prop = { "size": 7})
+    plt.tight_layout()
+
+    bigcsv.plot.line(x="Time", y=xvelaxis, alpha=1) # plots xvelocity versus time for all fish\ 
+    plt.title("X Velocity of Fish Over Time")
+    plt.xlabel("Time (sec)")
+    plt.ylabel("Velocity (m/s)")
+    plt.legend(loc='upper center', bbox_to_anchor=(1.1, 1.016), ncol=1, prop = { "size": 7})
+    plt.tight_layout()
 
     # FOR POSITIONS - overlays different lines together!
-    fig, ax = plt.subplots()
-    line1 = ax.plot(bigcsv['Xpositions1'], bigcsv['Ypositions1'])
-    line2 = ax.plot(bigcsv['Xpositions2'], bigcsv['Ypositions2'])
-    line3 = ax.plot(bigcsv['Xpositions3'], bigcsv['Ypositions3'])
-    line4 = ax.plot(bigcsv['Xpositions4'], bigcsv['Ypositions4'])
-    line5 = ax.plot(bigcsv['Xpositions5'], bigcsv['Ypositions5'])
-    line6 = ax.plot(bigcsv['Xpositions6'], bigcsv['Ypositions6'])
-    line7 = ax.plot(bigcsv['Xpositions7'], bigcsv['Ypositions7'])
-    line8 = ax.plot(bigcsv['Xpositions8'], bigcsv['Ypositions8'])
-    line9 = ax.plot(bigcsv['Xpositions9'], bigcsv['Ypositions9'])
-    line10 = ax.plot(bigcsv['Xpositions10'], bigcsv['Ypositions10'])
-
-
+    fig, positions = plt.subplots()
+    line1 = positions.plot(bigcsv['Xpositions1'], bigcsv['Ypositions1'])
+    line2 = positions.plot(bigcsv['Xpositions2'], bigcsv['Ypositions2'])
+    line3 = positions.plot(bigcsv['Xpositions3'], bigcsv['Ypositions3'])
+    line4 = positions.plot(bigcsv['Xpositions4'], bigcsv['Ypositions4'])
+    line5 = positions.plot(bigcsv['Xpositions5'], bigcsv['Ypositions5'])
+    line6 = positions.plot(bigcsv['Xpositions6'], bigcsv['Ypositions6'])
+    line7 = positions.plot(bigcsv['Xpositions7'], bigcsv['Ypositions7'])
+    line8 = positions.plot(bigcsv['Xpositions8'], bigcsv['Ypositions8'])
+    line9 = positions.plot(bigcsv['Xpositions9'], bigcsv['Ypositions9'])
+    line10 = positions.plot(bigcsv['Xpositions10'], bigcsv['Ypositions10'])
     
     # set the legend for multiple plots
-    ax.legend(['Fish1', 'Fish2', "Fish3", "Fish4", "Fish5", "Fish6", "Fish7", "Fish8", "Fish9", "Fish10"], prop = { "size": 7}, loc ="upper right")
+    positions.legend(['Fish1', 'Fish2', "Fish3", "Fish4", "Fish5", "Fish6", "Fish7", "Fish8", "Fish9", "Fish10"], prop = { "size": 7}, loc ="upper right")
 
     # set title of plot
-    ax.set_title('Postions')
-    ax.set_xlabel('Fish X Position (m)')
-    ax.set_ylabel('Fish Y Position (m)')
-    ax.set_ylim(0, 0.75) # match the tank 
-    ax.set_xlim(0, 0.9 )# match the tank
-
+    positions.set_title('Postions')
+    positions.set_xlabel('Fish X Position (m)')
+    positions.set_ylabel('Fish Y Position (m)')
+    positions.set_ylim(0, 0.75) # match the tank 
+    positions.set_xlim(0, 0.9 ) # match the tank
     plt.show()
