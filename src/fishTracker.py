@@ -5,7 +5,7 @@ import math
 from datetime import datetime
 import os
 #from tracker import *
-from tracker2 import *
+from idtracker import *
 import convert as c
 import setupcontrol as sc
 import lure as lure
@@ -28,8 +28,7 @@ LyPos = []
 FxPos = []
 FyPos = []
 
-fishTracker = tracker2(10)
-lureTracker = tracker2(2)
+fishidTracker = idtracker(10)
 
 bg_model = cv2.createBackgroundSubtractorKNN(history = 800, dist2Threshold = 255.0, detectShadows = False) 
 
@@ -174,7 +173,7 @@ class fishTracker:
                 x, y, w, h = cv2.boundingRect(cnt)
                 fishdetections.append([x, y, t, w, h])
 
-        fish_boxes_ids = fishTracker.update(fishdetections) # contains fish identifications
+        fish_boxes_ids = fishidTracker.update(fishdetections) # contains fish identifications
         returnCoords = []
         if fish_boxes_ids is not None:
             for box_id in fish_boxes_ids:
@@ -214,7 +213,7 @@ class fishTracker:
     def getFishDict(self):
         t= float(1/10)
         while self.is_go():
-            ct.create_fish_state(0, t)
+            self.create_fish_state(0, t)
             t+=1
         return self._fs.returnInfo(self._fishObjList)
     
@@ -282,16 +281,9 @@ class fishTracker:
         if fish_pos:
             closest_fish_state = object_state.Object(t, fish_pos[0], fish_pos[1], 0) #theta is 0 for now?? how to calculate this? same as lure?
             return closest_fish_state
-
-
+         
     def is_go(self):
         return self._go
-
-    def cleanup(self):
-        self._cap
-        if self._save_video:
-            self._out.release()
-        cv2.destroyAllWindows()
 
 if __name__ == '__main__':
     camera_index = 0
@@ -301,5 +293,3 @@ if __name__ == '__main__':
     camera_bounds = np.array([[570,  300], [1450, 820]]) # find these with calibrate_setup.pyq
     ft = fishTracker(foregroundpath, backgroundPath, camera_bounds)
     ft.getFishDict()
-
-    ft.cleanup()
