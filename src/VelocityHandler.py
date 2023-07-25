@@ -84,7 +84,6 @@ class VelocityHandler:
         
         return mega_dataset
 
-    
 
 if __name__ == '__main__':
     # initialize list elements
