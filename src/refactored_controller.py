@@ -13,8 +13,10 @@ import get_traj
 import make_traj_pts
 from positions_in_tank import *
 import csv
+from csv import DictWriter
 import os
 from datetime import datetime
+import data_class
 
 
 
@@ -34,6 +36,7 @@ class Controller():
        self._fish_arr = []
        self._des_arr = []
        self._distance_arr = []
+       self._data_logger = data_class.DataLogger(plot_data, save_data)
 
 
    def send_commands(self, vR, vL):
@@ -78,8 +81,9 @@ class Controller():
        #initialize clock
        start_time = time.time()
        current_time = time.time() - start_time
-       max_time = 10 #change this as needed
+       max_time = 30 #change this as needed
 
+       self._data_logger.create_file()
 
        X_r = self._video.get_robot_state(current_time)
        #curr_time = X_r.t
@@ -130,18 +134,13 @@ class Controller():
           
           self.send_commands(vRight, vLeft)
 
-          now = datetime.now()
-          data_folder = 'data/' + 'backup' + now.strftime("%m.%d.%Y/") 
-          print(data_folder)
-          data_filename = 'data/' + 'backup'+ now.strftime("%m.%d.%Y/%H.%M") + '.csv'
-          print(data_filename)
-          if not os.path.exists(data_folder):
-              os.makedirs(data_folder)
-              f = open(data_filename, 'w')
-              writer = csv.writer(f)
-              fieldnames = ['robot states', 'fish states', 'desired states', 'distances']
-              writer.writeheader(fieldnames)
-              f.close()
+
+          #create the backup file and write headers
+
+          # put this before the while loop
+          #data logger class - calls to string from string to initialize and add etc.
+          #initialize before while loop
+          #one line to "log data" then close data log 
 
           if self._video._go:
                #self._time_arr.append(current_time)
@@ -152,34 +151,12 @@ class Controller():
                    rob2fish = X_r.distance_to(X_f)
                    self._distance_arr.append(rob2fish)
                    print(rob2fish)
+               else: 
+                   rob2fish = str()
                self._des_arr.append(X_des)
                self.send_commands(vRight, vLeft) # go as usual
-               rows = [{'robot states': self._robot_arr,
-                       'fish states': self._fish_arr,
-                       'desired states': self._des_arr,
-                       'distances' : self._distance_arr
-                       }]
-               file = data_filename
-               with open(file, 'w', newline ='') as f:
-                   fieldnames = ['robot states', 'fish states', 'desired states', 'distances']
-                   writer = csv.DictWriter(f, fieldnames = fieldnames)
-                   writer.writeheader()
-                   writer.writerows(rows)
+               self._data_logger.log_data(X_r, X_f, X_des, rob2fish)
 
-
-
-
-          if self._video._go:
-               #self._time_arr.append(current_time)
-               self._robot_arr.append(X_r)
-               #self._theta_arr.append(theta)
-               if X_f:
-                   self._fish_arr.append(X_f)
-                   rob2fish = X_r.distance_to(X_f)
-                   self._distance_arr.append(rob2fish)
-                   print(rob2fish)
-               self._des_arr.append(X_des)
-               self.send_commands(vRight, vLeft) # go as usual
 
 
           else:
@@ -256,9 +233,9 @@ if __name__ == '__main__':
     #keck: [570,  311], [1442, 802]
     # keck camera 2: [[ 699    9], [1204  892]][[ 140  627][1066  130]]
     # keck 7/14: [ 579  317],[1419  783]
-    camera_bounds = np.array([[ 579,  317],[1419,  783]]) # find these with calibrate_setup.py
+    camera_bounds = np.array([[601, 362], [1414, 782]]) # find these with calibrate_setup.py
     # find these with calibrate_setup.py
-    port_t = '/dev/tty.usbmodem1302'                # find this with ls /dev/tty.usb*   Change this port as needed
+    port_t = '/dev/tty.usbmodem11302'                # find this with ls /dev/tty.usb*   Change this port as needed
     port_c = 0                                      # either 0 or 1
     c = Controller(camera_bounds = camera_bounds, camera_port = port_c, transmit_port = port_t)
     

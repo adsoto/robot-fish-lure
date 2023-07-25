@@ -28,13 +28,16 @@ class Object:
         return distance
     
     def to_string(self): #should this maybe be a list? 
-        t_string = str(self.t)
-        x_string = str(self.x)
-        y_string = str(self.y)
-        theta_string = str(self.theta)
-        object_string = t_string+ ',' + x_string+ ',' + y_string + ',' +theta_string
-        #object_list = t_string + x_string + y_string + theta_string
-        return object_string
+        if self:
+            t_string = str(self.t)
+            x_string = str(self.x)
+            y_string = str(self.y)
+            theta_string = str(self.theta)
+            object_string = t_string+ ',' + x_string+ ',' + y_string + ',' +theta_string
+            #object_list = t_string + x_string + y_string + theta_string
+            return object_string
+        else:
+            return str() 
     
     
 def to_object(string): #not a part of the Object class because it takes in a string
@@ -46,16 +49,7 @@ def to_object(string): #not a part of the Object class because it takes in a str
     new_object = Object(t,x,y,theta)
     return new_object
 
-    
 
-
-    
-
-    #to string function (comma values)
-    # t ,x, y, theta
-    #from string function also - takes string and goes to object 
-    #
-    #use this and add data to csv 
 
 
 
