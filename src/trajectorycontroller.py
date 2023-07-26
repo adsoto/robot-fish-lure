@@ -14,7 +14,7 @@ import data_handler as dh
 import matplotlib.pyplot as plt
 import video_processor as vp
 import lure as lure
-import centroidTracker 
+import fishTracker 
 trajectory = rect_trajectory
 trajBD = trajBD
 trajAC = trajAC
@@ -32,7 +32,7 @@ class Controller():
        self._lookahead = lookahead
        self._data_handler = dh.DataHandler(plot_data, save_data)
        self._video = lure.VideoProcessor(camera_port, camera_bounds, save_video)
-       self._centroidTracker = centroidTracker.centroidTracker(camera_port, camera_bounds, save_video)
+       self._centroidTracker = fishTracker.centroidTracker(camera_port, camera_bounds, save_video)
        self._robot_arr = []
        self._time_arr = []
        self._theta_arr = []

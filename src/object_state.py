@@ -7,7 +7,7 @@ import data_handler as dh
 import matplotlib.pyplot as plt
 import video_processor as vp
 import lure as lure
-import centroidTracker 
+import fishTracker 
 
 
 class Object: 

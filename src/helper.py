@@ -7,7 +7,7 @@ import data_handler as dh
 import matplotlib.pyplot as plt
 import video_processor as vp
 import lure as lure
-import centroidTracker 
+import fishTracker 
 import object_state as os
 from positions_in_tank import *
 import make_traj_pts

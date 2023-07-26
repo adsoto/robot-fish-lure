@@ -7,7 +7,7 @@ import data_handler as dh
 import matplotlib.pyplot as plt
 import video_processor as vp
 import lure as lure
-import centroidTracker 
+import fishTracker 
 from datetime import datetime
 import object_state
 import os
@@ -25,12 +25,13 @@ class DataLogger:
         self._fish = {}
         self._desired = {}
         self._distances = {}
+        self._now = datetime.now()
     
     def create_file(self): #should this be part of the initializer?? 
         #gets time and date and checks for existing file etc.
-        now = datetime.now()
-        data_folder = 'data/' +'backup/'+ now.strftime("%m.%d.%Y/") 
-        data_filename = 'data/' + 'backup/' + now.strftime("%m.%d.%Y/%H.%M") + '.csv'
+        #now = datetime.now()
+        data_folder = 'data/' +'backup/'+ self._now.strftime("%m.%d.%Y/") 
+        data_filename = 'data/' + 'backup/' + self._now.strftime("%m.%d.%Y/%H.%M") + '.csv'
 
 
         if not os.path.exists(data_folder):
@@ -57,7 +58,7 @@ class DataLogger:
         desired_string = desired_state.to_string()
 
         now = datetime.now()
-        data_filename = 'data/'+ 'backup/'+ now.strftime("%m.%d.%Y/%H.%M") + '.csv'
+        data_filename = 'data/'+ 'backup/'+ self._now.strftime("%m.%d.%Y/%H.%M") + '.csv'
 
         df = pd.read_csv(data_filename)
   
