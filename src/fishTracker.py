@@ -59,8 +59,7 @@ class fishTracker:
 
     def get_fish_thresh(self):
         ret, frame = self._cap.read()
-        backframe = self._backframe
-
+     
         if (not ret): 
             print("frame has nothing")
             self.is_go == False
@@ -74,6 +73,7 @@ class fishTracker:
         
 
         if sc.setup == "KECK":
+            backframe = self._backframe
             backframe = cv2.undistort(backframe, MTX, DIST, None, MTX)
             backframe = backframe[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
 
