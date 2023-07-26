@@ -108,7 +108,13 @@ class VideoProcessor:
         """Shows live video feed, plotting dots on identified objects and the bot target"""
 
         if self._current_frame is not None:
-            cv2.circle(self._current_frame, (int(target.x/PIX2METERS), int(self._height-target.y/PIX2METERS)), 5, (0, 159, 22), -1)
+
+            xpx = convert.xmettopx(target.x)
+            ypx = convert.ymettopx(target.y)
+            print("centroid in pixels",xpx, ypx)
+            cv2.circle(self._current_frame, (int(xpx), int(self._height-ypx)), 5, (0, 159, 22), -1)
+
+            # cv2.circle(self._current_frame, (int(target.x/PIX2METERS), int(self._height-target.y/PIX2METERS)), 5, (0, 159, 22), -1)
             cv2.namedWindow("output", cv2.WINDOW_NORMAL)
             resized = cv2.resize(self._current_frame, (960, 540))
             cv2.imshow('frame', resized)
