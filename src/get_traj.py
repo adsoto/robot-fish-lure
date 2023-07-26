@@ -20,7 +20,7 @@ def get_traj_function(X_r, X_f, current_traj):
   if X_f:
       fish_pos = [X_f.x, X_f.y]
   radius_about_pt = 0.1 # 5 cm
-  fish_alert_radius = 0.08 # 8 cm
+  fish_alert_radius = 0.2 # 8 cm
   fish_not_alert_radius = 0.00001
   theta = 0; # desired theta currently defaulting to 0
   # start_time initialized in c.run = gloabl computer time = wonky number

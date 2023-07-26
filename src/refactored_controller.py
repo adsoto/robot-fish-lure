@@ -108,7 +108,7 @@ class Controller():
           #hard code Xdes to be 0.5 
           current_time = time.time() - start_time
           print("current time: ", current_time)
-          X_r = self._video.get_robot_state(current_time) #in orange 
+          X_r = self._video.get_robot_state(current_time) #in lure 
 
           print("robot state", X_r.x, X_r.y)
           X_f = self._centroidTracker.get_closest_fish_state(current_time) #closest fish
@@ -162,7 +162,11 @@ class Controller():
 
           else:
                start_time = time.time() # reset start time
+
           self._video.display(X_des)
+          if X_f:
+              self._video.display(X_f)
+
 
 
    def end(self):

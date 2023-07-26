@@ -45,6 +45,7 @@ class fishTracker:
             self._go = True # not implemented
             self._current_frame = None
             self._bounds = camera_bounds
+            self._height = camera_bounds[1,1]-camera_bounds[0,1]
             self._fishObjList = {}
 
     if sc.setup == "LAIR":
@@ -56,6 +57,7 @@ class fishTracker:
             self._current_frame = None
             self._bounds = camera_bounds
             self._fishObjList = {}
+            self._height = camera_bounds[1,1]-camera_bounds[0,1]
 
     def get_fish_thresh(self):
         ret, frame = self._cap.read()
@@ -255,7 +257,7 @@ class fishTracker:
         # PIX to METER CONVERSIONS #
         for f in fishCoords:
             f[0] = c.xpxtomet(int(f[0]))
-            f[1] = c.ypxtomet(int(f[1]))
+            f[1] = c.ypxtomet(int(self._height - f[1]))
 
         lurePos[0] = c.xpxtomet(int(lurePos[0]))
         lurePos[1] = c.ypxtomet(int(lurePos[1]))

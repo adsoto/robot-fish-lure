@@ -3,6 +3,7 @@ import cv2
 import os
 from datetime import datetime
 import object_state
+import convert as convert
 
 PIX2METERS = .635/820 # meters/pixels conversion TODO: automate this calculation in __init__
 FPS = 10
@@ -85,11 +86,15 @@ class VideoProcessor:
             if M["m00"] != 0:
                 cX = int(M["m10"] / M["m00"])
                 cY = int(M["m01"] / M["m00"])
+
+                met_cX = convert.xpxtomet(cX)
+                met_cY = convert.ypxtomet(self._height - cY)
+
             else: cX, cY = 0, 0
             cv2.circle(self._current_frame, (cX, cY), int(5/(i+1)), (320, 159, 22), -1)
-            coords[i,:] = np.array([cX, cY])
-        coords[:,1] = self._height - coords[:,1] # move origin to lower left corner
-        return coords*PIX2METERS
+            coords[i,:] = np.array([met_cX, met_cY])
+        # coords[:,1] = (convert.ypxtomet(self._height)) - coords[:,1] # move origin to lower left corner
+        return coords
     
     def get_robot_state(self, t):
         [head, tail] = self.get_coords(2)
@@ -105,7 +110,9 @@ class VideoProcessor:
         """Shows live video feed, plotting dots on identified objects and the bot target"""
 
         if self._current_frame is not None:
-            cv2.circle(self._current_frame, (int(target.x/PIX2METERS), int(self._height-target.y/PIX2METERS)), 5, (0, 159, 22), -1)
+            xpx = convert.xmettopx(target.x)
+            ypx = convert.ymettopx(target.y)
+            cv2.circle(self._current_frame, (int(xpx), int(self._height-ypx)), 5, (0, 159, 22), -1)
             cv2.namedWindow("output", cv2.WINDOW_NORMAL)
             resized = cv2.resize(self._current_frame, (960, 540))
             cv2.imshow('frame', resized)
