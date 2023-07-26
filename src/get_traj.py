@@ -1,9 +1,5 @@
-
-
-
-
 # new get_traj function for refactored code. calculates theta_des and dist based on most recent waypoint and next waypoint
-# last edited: 7/12/23 12pm
+# last edited: 7/26/23 - robot only evades corner C with a habitat in it. 
 # contact: alisha - achulani@hmc.edu and holly - hachen@hmc.edu
 import numpy as np
 from positions_in_tank import *
@@ -25,6 +21,7 @@ def get_traj_function(X_r, X_f, current_traj):
       fish_pos = [X_f.x, X_f.y]
   radius_about_pt = 0.1 # 5 cm
   fish_alert_radius = 0.08 # 8 cm
+  fish_not_alert_radius = 0.00001
   theta = 0; # desired theta currently defaulting to 0
   # start_time initialized in c.run = gloabl computer time = wonky number
   # current_time initialized in c.run = corrected robot start time
@@ -85,7 +82,7 @@ def get_traj_function(X_r, X_f, current_traj):
   if A_rob_dist <= radius_about_pt:
       print('in A')
       # if fish close
-      if robot2fish <= fish_alert_radius:
+      if robot2fish <= fish_not_alert_radius:
           print('evading from A')
           # # A->C
           dist =  A_C_dist#C_rob_dist
@@ -104,7 +101,7 @@ def get_traj_function(X_r, X_f, current_traj):
   elif B_rob_dist <= radius_about_pt:
       print("within B")
       # if fish close
-      if robot2fish <= fish_alert_radius:
+      if robot2fish <= fish_not_alert_radius:
           print("fish in B - evade to D")
       # B->D
           dist = B_D_dist
@@ -136,7 +133,7 @@ def get_traj_function(X_r, X_f, current_traj):
       # if at pos D
   elif D_rob_dist <= radius_about_pt:
       # if fish close
-      if robot2fish <= fish_alert_radius:
+      if robot2fish <= fish_not_alert_radius:
       # D->B
           dist = B_D_dist
           theta = np.arctan2((B_y - D_y), (B_x - D_x))

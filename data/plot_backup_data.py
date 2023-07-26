@@ -80,9 +80,6 @@ distances = [pos for pos in df['Distances']]
 distances = [x for x in distances if str(x) != 'nan']
 
 
-
-
-
 "PLOT DATA!"
 # ~~ PLOT 1: Positions (actual/desired) ~~
 fig, ax = plt.subplots()
