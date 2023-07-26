@@ -9,7 +9,7 @@ global bounds # find these with calibrate_setup.py
 #LAIR: [ 687  396][1483  801]
 #keck: [595,  331], [1425, 801]
 if setup == "LAIR":
-    bounds = np.array([[595,  331], [1425, 801]])   #CHANGE THESE! THESE ARE TANK BOUNDS
+    bounds = np.array([[601, 362], [1414, 782]])   #CHANGE THESE! THESE ARE TANK BOUNDS
 else: 
     bounds = np.array([[595,  331], [1425, 801]])
 

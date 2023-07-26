@@ -26,10 +26,11 @@ class Controller():
    def __init__(self, plot_data=True, save_data=True, camera_port=0, camera_bounds = np.array([[420, 365], [1340, 905]]),
                 save_video=True, transmit_port='/dev/tty.usbmodem1402'):
        print("initializing controller")
+       bg_image = r"/Users/alishachulani/Desktop/background.png"
        self._ser = serial.Serial(transmit_port, baudrate=115200)
        self._data_handler = dh.DataHandler(plot_data, save_data)
        self._video = lure.VideoProcessor(camera_port, camera_bounds, save_video)
-       self._centroidTracker = fishTracker.centroidTracker(camera_port, camera_bounds, save_video)
+       self._centroidTracker = fishTracker.fishTracker(camera_port, bg_image, camera_bounds)
        self._robot_arr = []
        self._time_arr = []
        self._theta_arr = []
@@ -179,7 +180,7 @@ class Controller():
     y = [pos.y for pos in self._robot_arr]
     theta = [pos.theta for pos in self._robot_arr]
     v = np.linalg.norm(np.diff(np.array([x, y])), axis=0)/np.diff(t) #filter velocity data. overplot desired vs. actual. change to central velocity calculations
-    print(np.diff(t))
+    
     xdes = [pos.x for pos in self._des_arr]
     ydes = [pos.y for pos in self._des_arr]
     tdes = [pos.t for pos in self._des_arr]
@@ -235,7 +236,7 @@ if __name__ == '__main__':
     # keck 7/14: [ 579  317],[1419  783]
     camera_bounds = np.array([[601, 362], [1414, 782]]) # find these with calibrate_setup.py
     # find these with calibrate_setup.py
-    port_t = '/dev/tty.usbmodem11302'                # find this with ls /dev/tty.usb*   Change this port as needed
+    port_t = '/dev/tty.usbmodem1102'                # find this with ls /dev/tty.usb*   Change this port as needed
     port_c = 0                                      # either 0 or 1
     c = Controller(camera_bounds = camera_bounds, camera_port = port_c, transmit_port = port_t)
     

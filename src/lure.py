@@ -34,7 +34,7 @@ class VideoProcessor:
             display = date[:10]
 
             video_folder = 'data/' + display
-            video_filename = 'data/' + filename + '.avi'
+            video_filename = 'data/' + filename + '.mp4'
  
             #result = cv2.VideoWriter(video_filename +".avi",cv2.VideoWriter_fourcc(*'MJPG'),FPS, (size[0][0],size[0][1]))
             if not os.path.exists(video_folder):
