@@ -7,6 +7,7 @@ import os
 import VelocityTracker as vt
 import VelocityHandler as vh
 import fishTracker as ft
+import numpy as np
 
 class Plotter:
     def __init__(self, numfish):
@@ -81,29 +82,18 @@ class Plotter:
 
 if __name__ == '__main__':
 
-    robotcsv = '/Users/loaner/Downloads/7.17.23 - 16.28.csv' # CHANGE THIS!!!
-
-    fishdict =  {
-        # t, x, y, vx, vy
-                  1:  [[1 , 10, 30],  [30 , 100, 300], [55 , 1000, 5000], [77 , 10000, 20000]], 
-                  2:  [[1 , 20, 50],  [30 , 200, 500], [55, 2000, 7000],  [77 , 20000, 40000]], 
-                  3:  [[1 , 30, 90],  [30 , 300, 700], [55, 3000, 9000],  [77 , 30000, 50000]],
-                  4:  [[1 , 40, 120], [30 , 400, 900], [55 , 4000, 1200], [77 , 40000, 70000]], 
-                  5:  [[1 , 20, 50],  [30 , 200, 500], [55, 2000, 7000],  [77 , 20000, 40000]], 
-                  6:  [[1 , 30, 90],  [30 , 300, 700], [55, 3000, 9000],  [77 , 30000, 50000]],
-                  7:  [[1 , 40, 120], [30 , 400, 900], [55 , 4000, 1200], [77 , 40000, 70000]], 
-                  8:  [[1 , 10, 30],  [30 , 100, 300], [55 , 1000, 5000], [77 , 10000, 20000]], 
-                  9:  [[1 , 10, 30],  [30 , 100, 300], [55 , 1000, 5000], [77 , 10000, 20000]], 
-                  10:  [[1 , 10, 30],  [30 , 100, 300], [55 , 1000, 5000], [77 , 10000, 20000]], 
-
-                 }
-
-    # fishdict = ft.run
-
+    robotcsv = r"/Users/loaner/Downloads/7.17.23 - 16.28.csv" # CHANGE THIS!!!
     plotter = Plotter(11) # input the number of fish in the video! -- input length +1 becuase of zero indexing
 
     # creates time and position dictionary
     #something here from fishtracker about getting dictionary!
+
+    foregroundpath = r"/Users/loaner/Downloads/use_for_velocities (online-video-cutter.com).mp4"
+    backgroundPath = r"/Users/loaner/Downloads/background.png"
+    camera_bounds = np.array([[570,  300], [1450, 820]]) # find these with calibrate_setup.pyq
+    ft = ft.fishTracker(foregroundpath, backgroundPath, camera_bounds)
+    fishdict = ft.getFishDict()
+    print("dict", fishdict)
     
     # sends time and position dictionary to calculate velocity in velocitytracker.py
     vt = vt.CalcVelocity(fishdict) # takes self, fishdict
@@ -116,6 +106,7 @@ if __name__ == '__main__':
     bigcsv = plotter.read_bigcsv(megadata_filename) # input the fish file we want to read!
     print(bigcsv) # checks that this was imported correctly
 
+    print("nonee???", robotcsv)
     robotposition = plotter.read_indivcsv(robotcsv) #input the robot file we want to read!
     print(robotposition) # checks that this was imported correctly
 

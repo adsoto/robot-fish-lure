@@ -40,7 +40,7 @@ class fishTracker:
         def __init__(self, camera_port, background_path, camera_bounds):
             self._cap = cv2.VideoCapture(camera_port)
             self._backframe = cv2.imread(background_path, cv2.IMREAD_COLOR)
-            self._lure =  lure.VideoProcessor(camera_port, camera_bounds, False)
+            self._lure =  lure.VideoProcessor(camera_port, camera_bounds)
             self._fs = fish.fishState(0, [])
             self._go = True # not implemented
             self._current_frame = None
@@ -59,11 +59,12 @@ class fishTracker:
 
     def get_fish_thresh(self):
         ret, frame = self._cap.read()
-     
+        
+
         if (not ret): 
             print("frame has nothing")
-            self.is_go == False
-            self.runexit()
+            self._go = False
+            return
 
         frame = cv2.undistort(frame, MTX, DIST, None, MTX)
         frame = frame[self._bounds[0][1]:self._bounds[1][1], self._bounds[0][0]:self._bounds[1][0]]
@@ -122,7 +123,7 @@ class fishTracker:
 
         if (fish_thresh is None): 
             print("no thresh")
-            exit(0)  # if frame isn't valid, return
+            return  # if frame isn't valid, return
 
         fish_cnts, hierarchy = cv2.findContours(fish_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         sortedfishContours = sorted(fish_cnts, key=cv2.contourArea, reverse=True)
@@ -162,6 +163,11 @@ class fishTracker:
         fishCoords = []
         cnts = self.get_fish_contours()
 
+        if (cnts is None): 
+            print("no cnts")
+            self._go = False
+            return 
+
         #if (len(cnts)) < fish_id: return fishCoords # if there aren't enough contours, return
 
         fishdetections = []
@@ -195,32 +201,26 @@ class fishTracker:
             for coord in fishCoords:
                 if fish_id == 0:
                     #print (fishCoords)
+
                     returnCoords = fishCoords
                     break
                 if coord[0] == fish_id:
                     #print (coord)
                     returnCoords = coord
-                else:
-                    #print("fish out of frame")
-                    pass
-            #print(returnCoords)
-            objList = self._fs.update(returnCoords)
-            self._fishObjList = objList
-
-            returnDict = self._fs.returnInfo(objList)
-        return returnDict
+            self._fs.update(returnCoords)
+            
 
     def getFishDict(self):
         t= float(1/10)
-        while self.is_go():
+        while self._go:
             self.create_fish_state(0, t)
             t+=1
-        return self._fs.returnInfo(self._fishObjList)
+        print("no longer is go")
+        return self._fs.returnInfo()
     
     def runexit(self):
-        print(self._fs.returnInfo(self._fishObjList))
-        exit(0)
-        #return "hi"
+        print(self._fs.returnInfo())
+        return self._fs.returnInfo()
         
 
     
@@ -288,8 +288,11 @@ class fishTracker:
 if __name__ == '__main__':
     camera_index = 0
     #foregroundpath = r"C:\Users\ginar\OneDrive\Documents\robot-fish-lure-code-refactor\videos\use_for_velocities.avi"
-    foregroundpath = r"C:\Users\ginar\OneDrive\Documents\robot-fish-lure-code-refactor\videos\short_velocities.mp4"
-    backgroundPath = r"C:\Users\ginar\OneDrive\Documents\robot-fish-lure-code-refactor\videos\background2.png"
+    foregroundpath = r"C:\Users\ginar\OneDrive\Documents\robot-fish-lure-code-refactor\src\use_for_velocities (online-video-cutter.com).mp4"
+    backgroundPath = r"C:\Users\ginar\OneDrive\Documents\robot-fish-lure-code-refactor\src\background.png"
     camera_bounds = np.array([[570,  300], [1450, 820]]) # find these with calibrate_setup.pyq
     ft = fishTracker(foregroundpath, backgroundPath, camera_bounds)
-    ft.getFishDict()
+    dict = ft.getFishDict()
+    #ft.self._fs.returnInfo(ft.self._fishObjList)
+    ft.runexit()
+    #print(ft.self._fishObjList)

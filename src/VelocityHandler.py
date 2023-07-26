@@ -12,14 +12,15 @@ class VelocityHandler:
 
     def createdataframe(self, dataframe_name, fish, fishdict):
         poslist = fishdict[fish]
-        
+        frameindex = self.createframeindex(poslist)
         time_list = self.timelist(poslist)
         xpos_list = self.Xposlist(poslist)
         ypos_list = self.Yposlist(poslist)
         xvel_list = self.Xvelocitylist(poslist)
         yvel_list = self.Yvelocitylist(poslist)
 
-        df = pd.DataFrame(time_list, columns=['Time'], index=['frame1','frame2', 'frame3', 'frame4'])
+
+        df = pd.DataFrame(time_list, columns=['Time'], index=frameindex)
         df['Xpositions'] = xpos_list
         df['Ypositions'] = ypos_list
         df['Xvelocity'] = xvel_list
@@ -62,10 +63,20 @@ class VelocityHandler:
             yvel_list.append(yvel)
         return yvel_list
     
+    def createframeindex(self, poslist):
+        frameindex = []
+        for i in list(range(len(poslist))):
+            addframe = "frame" + str(i+1)
+            frameindex.append(addframe)
+
+        return frameindex
+
+    
     def megadataframe(self, fishdict):
         mega_dataset = pd.DataFrame()  # initialize megadataframe
 
         time_list = self.timelist(fishdict[1])
+        frameindex = self.createframeindex(fishdict[1])
 
         for i in fishdict:
             poslist = fishdict[i]
@@ -74,7 +85,7 @@ class VelocityHandler:
             xvel_list = self.Xvelocitylist(poslist)
             yvel_list = self.Yvelocitylist(poslist)
 
-            df = pd.DataFrame(time_list, columns=['Time' + str(i)], index=['frame1','frame2', 'frame3', 'frame4'])
+            df = pd.DataFrame(time_list, columns=['Time' + str(i)], index=frameindex)
             df['Xpositions' + str(i)] = xpos_list
             df['Ypositions'+ str(i)] = ypos_list
             df['Xvelocity'+ str(i)] = xvel_list
@@ -118,6 +129,7 @@ if __name__ == '__main__':
                 2: [[1, 20, 50, 6.2069, 15.5172, 421.2766, 840.4255], [30, 200, 500, 36.6667, 128.7037], [55, 2000, 7000, 421.2766, 840.4255], [77, 20000, 40000, 818.1818, 1500.0]], 
                 3: [[1, 30, 90, 9.3103, 21.0345, 631.9149, 1048.9362], [30, 300, 700, 55.0, 165.0], [55, 3000, 9000, 631.9149, 1048.9362], [77, 30000, 50000, 1227.2727, 1863.6364]], 
                 4: [[1, 40, 120, 12.4138, 26.8966, 842.5532, 1470.2128], [30, 400, 900, 73.3333, 20.0], [55, 4000, 1200, 842.5532, 1470.2128], [77, 40000, 70000, 1636.3636, 3127.2727]]
+    
                 }
     
     # cv = vt.CalcVelocity(fishdict)
@@ -126,3 +138,6 @@ if __name__ == '__main__':
     vh = VelocityHandler(fishdict)
 
     vh.run()
+
+
+

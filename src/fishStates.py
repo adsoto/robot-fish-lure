@@ -51,9 +51,9 @@ class fishState:
     def get_pos(self):
         return self.posList
     
-    def returnInfo(self, objList):
+    def returnInfo(self):
         dictionary = {}
-        for obj in objList:
+        for obj in fishObjList:
             key = obj.get_id()
             value = obj.get_pos()
             dictionary[key] = value
@@ -64,6 +64,7 @@ if __name__ == '__main__':
     fs = fishState(0, [])
     fs.update([[1, 756, 317, 1], [2, 444, 1, 1], [3, 671, 127, 1], [4, 736, 237, 1]])
     fs.update([[1, 760, 315, 2], [2, 440, 5, 2], [3, 675, 125, 2], [4, 735, 235, 2]])
+    fs.returnInfo()
     #fs.update([[6, 814, 441, 33], [5, 785, 380, 33], [1, 700, 227, 33], [3, 607, 144, 33], [7, 837, 127, 33], [11, 271, 5, 33], [8, 809, 268, 33], [4, 567, 219, 33]])
 
         
