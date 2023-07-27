@@ -11,7 +11,7 @@ global bounds # find these with calibrate_setup.py
 if setup == "LAIR":
     bounds = np.array([[601, 362], [1414, 782]])   #CHANGE THESE! THESE ARE TANK BOUNDS
 else: 
-    bounds = np.array([[595,  331], [1425, 801]])
+    bounds = np.array([[570,  300], [1450, 820]])
 
 global inmeters
 points = straight_line # change the robot path here

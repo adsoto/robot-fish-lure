@@ -250,9 +250,14 @@ class fishTracker:
         fishCoords = self.get_fish_coords()
 
         [head, tail] = self._lure.get_coords(2)
-        headX, headY = head[0], head[1]
-        tailX, tailY = tail[0], tail[1]
-        lurePos = [((headX + tailX)/2), ((headY + tailY)/2)]
+        fish_vect = head - tail
+        theta = np.arctan2(fish_vect[1], fish_vect[0])
+        lurePos = (head + tail)/2
+
+        # [head, tail] = self._lure.get_coords(2)
+        # headX, headY = head[0], head[1]
+        # tailX, tailY = tail[0], tail[1]
+        # lurePos = [((headX + tailX)/2), ((headY + tailY)/2)]
 
         # PIX to METER CONVERSIONS #
         for f in fishCoords:

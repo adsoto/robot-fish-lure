@@ -19,7 +19,6 @@ from datetime import datetime
 import data_class
 
 
-
 class Controller():
    """Top-level class to run the robotic fish"""
 
@@ -57,7 +56,6 @@ class Controller():
            #print('entered0')
            #print("ttrack:",ttrack)
            if traj[i-1][0] <= ttrack <= traj[i][0]:
-               print("entered1")
                t1 = traj[i-1][0]
                t2 = traj[i][0]
                percentTime = (ttrack-t1)/(t2-t1)
@@ -65,12 +63,9 @@ class Controller():
                pos2 = [traj[i][1], traj[i][2]]
                distancevector = np.subtract(pos2, pos1) 
                target = pos1 + percentTime*distancevector
-               print("target:" , target)
-               print("theta des from traj: ", traj[3])
                X_des = object_state.Object(t, target[0], target[1], traj[i][3])
                return X_des
            elif ttrack > traj[len(traj)-1][0]:
-               print('entered2')
                target = [traj[len(traj)-1][1], traj[len(traj)-1][2]]
                print("target:" , target)
                X_des = object_state.Object(t, target[0], target[1], traj[i][3])
@@ -82,7 +77,7 @@ class Controller():
        #initialize clock
        start_time = time.time()
        current_time = time.time() - start_time
-       max_time = 65 #change this as needed
+       max_time = 300 #change this as needed
 
        self._data_logger.create_file()
 
@@ -112,26 +107,13 @@ class Controller():
 
           print("robot state", X_r.x, X_r.y)
           X_f = self._centroidTracker.get_closest_fish_state(current_time) #closest fish
-          #print("fish state" , X_f.x, X_f.y)
 
           #how to initialize an initial trajectory? 
-          traj_t = get_traj.get_traj_function(X_r, X_f, traj_t) #how to set this up to keep feeding previous trajs?
-
-          #traj_t = [[1, 0.1, 0.08, 0], [2, 0.25, 0.08, 0], [3, 0.5, 0.08, 0]]
-          #put fish conditionals in get traj (is Xf null...)
-
-          #print("traj: ", traj_t)
+          traj_t = get_traj.get_traj_function(X_r, X_f, traj_t) 
           
-          X_des = self.find_target(traj_t, current_time) #update find_target as well for these inputs
-
-          #X_des = object_state.Object(current_time, 0.35, 0.08, 0)
-          #print("X_des", X_des.x, X_des.y)
-          #distance = X_r.distance_to(X_des)
-          #print('distance: ', distance)
-
+          X_des = self.find_target(traj_t, current_time) 
           
-          [vRight, vLeft] = track_point(X_des, X_r) #update track_point function for these inputs
-          #[vRight, vLeft] = [15, 15]
+          [vRight, vLeft] = track_point(X_des, X_r)
           
           self.send_commands(vRight, vLeft)
 
@@ -238,9 +220,9 @@ if __name__ == '__main__':
     #keck: [570,  311], [1442, 802]
     # keck camera 2: [[ 699    9], [1204  892]][[ 140  627][1066  130]]
     # keck 7/14: [ 579  317],[1419  783]
-    camera_bounds = np.array([[601, 362], [1414, 782]]) # find these with calibrate_setup.py
+    camera_bounds = np.array([[570,  300], [1450, 820]]) # find these with calibrate_setup.py
     # find these with calibrate_setup.py
-    port_t = '/dev/tty.usbmodem1102'                # find this with ls /dev/tty.usb*   Change this port as needed
+    port_t = '/dev/tty.usbmodem1102'                # find this with qqqqq   Change this port as needed
     port_c = 0                                      # either 0 or 1
     c = Controller(camera_bounds = camera_bounds, camera_port = port_c, transmit_port = port_t)
     
