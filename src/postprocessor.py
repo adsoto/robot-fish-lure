@@ -82,14 +82,32 @@ class Plotter:
 
 if __name__ == '__main__':
 
-    robotcsv = r"/Users/loaner/Downloads/7.17.23 - 16.28.csv" # CHANGE THIS!!!
+    robotcsv = r"C:\Users\ginar\OneDrive\Documents\robot-fish-lure-code-refactor\src\7.17.23 - 16.28.csv" # CHANGE THIS!!!
+
+    #fishdict =  {
+        # t, x, y, vx, vy
+                #   1:  [[1 , 10, 30],  [30 , 100, 300], [55 , 1000, 5000], [77 , 10000, 20000]], 
+                #   2:  [[1 , 20, 50],  [30 , 200, 500], [55, 2000, 7000],  [77 , 20000, 40000]], 
+                #   3:  [[1 , 30, 90],  [30 , 300, 700], [55, 3000, 9000],  [77 , 30000, 50000]],
+                #   4:  [[1 , 40, 120], [30 , 400, 900], [55 , 4000, 1200], [77 , 40000, 70000]], 
+                #   5:  [[1 , 20, 50],  [30 , 200, 500], [55, 2000, 7000],  [77 , 20000, 40000]], 
+                #   6:  [[1 , 30, 90],  [30 , 300, 700], [55, 3000, 9000],  [77 , 30000, 50000]],
+                #   7:  [[1 , 40, 120], [30 , 400, 900], [55 , 4000, 1200], [77 , 40000, 70000]], 
+                #   8:  [[1 , 10, 30],  [30 , 100, 300], [55 , 1000, 5000], [77 , 10000, 20000]], 
+                #   9:  [[1 , 10, 30],  [30 , 100, 300], [55 , 1000, 5000], [77 , 10000, 20000]], 
+                #   10:  [[1 , 10, 30],  [30 , 100, 300], [55 , 1000, 5000], [77 , 10000, 20000]], 
+
+                #  }
+
+    # fishdict = ft.run
+
     plotter = Plotter(11) # input the number of fish in the video! -- input length +1 becuase of zero indexing
 
     # creates time and position dictionary
     #something here from fishtracker about getting dictionary!
 
-    foregroundpath = r"/Users/loaner/Downloads/use_for_velocities (online-video-cutter.com).mp4"
-    backgroundPath = r"/Users/loaner/Downloads/background.png"
+    foregroundpath = r"C:\Users\ginar\OneDrive\Documents\robot-fish-lure-code-refactor\src\use_for_velocities (online-video-cutter.com).mp4"
+    backgroundPath = r"C:\Users\ginar\OneDrive\Documents\robot-fish-lure-code-refactor\src\background.png"
     camera_bounds = np.array([[570,  300], [1450, 820]]) # find these with calibrate_setup.pyq
     ft = ft.fishTracker(foregroundpath, backgroundPath, camera_bounds)
     fishdict = ft.getFishDict()
