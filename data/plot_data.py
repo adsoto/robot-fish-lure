@@ -10,26 +10,28 @@ import matplotlib.pyplot as plt
 #              https://stackoverflow.com/questions/44970881/matplotlib-multiple-scatter-subplots-with-shared-colour-bar
 
 ## Choose CSV file to read for plotting
-df = pd.read_csv('data/07.25.2023/15.06.csv') # read csv file from data folder. Ex: 'data/06.13.2023/13.17.csv' reads the 13.17.csv file from the 06.13.2023 subfolder inside data folder
+df = pd.read_csv('data/07.17.2023/16.28.csv') # read csv file from data folder. Ex: 'data/06.13.2023/13.17.csv' reads the 13.17.csv file from the 06.13.2023 subfolder inside data folder
 # print(df['Desired Position: y (m)'])
 # for col in df.columns:
 #     print(col)
 
 # ~~ PLOT 1: Positions (actual/desired) ~~
 fig, ax = plt.subplots()
-line1 = ax.scatter(df['Desired Position: x (m)'], df['Desired Position: y (m)'])
-line2 = ax.scatter(df['Actual Position: x (m)'],df['Actual Position: y (m)'])
-line3 = ax.scatter(df['Fish Position: x (m)'], df['Fish Position: y (m)'])
+line1 = ax.plot(df['Desired Position: x (m)'][0:95], df['Desired Position: y (m)'][0:95], linewidth = 5)
+line2 = ax.plot(df['Actual Position: x (m)'][0:95],df['Actual Position: y (m)'][0:95], linewidth = 5)
+line3 = ax.scatter(df['Fish Position: x (m)'][0:95], df['Fish Position: y (m)'][0:95], color='g')
+
+#print(df['Desired X-Pos vs. Time: time(s)'][0:100])
 
 # set the legend for multiple plots
-ax.legend(['Desired Position', 'Actual Position', "Fish Position"])
+ax.legend(['Desired Position', 'Actual Position', "Fish Position"], fontsize=15)
 
 # set title of plot
-ax.set_title('Postions')
-ax.set_xlabel('X (m)')
-ax.set_ylabel('Y (m)')
-ax.set_ylim(0, 0.6)
-ax.set_xlim(0, 0.6)
+ax.set_title('Postions', fontsize=15)
+ax.set_xlabel('X (m)', fontsize=15)
+ax.set_ylabel('Y (m)', fontsize=15)
+ax.set_ylim(0, 0.4)
+ax.set_xlim(0, 0.5)
 #ax.set_aspect(aspect=1)
 
 ## ~~ PLOT 2: X and Y (actual/desired) Positions ~~
@@ -90,11 +92,11 @@ axs5.set_ylabel('theta (rad)')
 #axs5.set_xlim(0, 0.6)
 
 
-fig4, axs6 = plt.subplots()
-line1 = axs6.scatter(df['Distance: time (s)'], df['Distance: distance (m)'])
-axs6.legend(['time (s)', 'distance (m)'])
-axs6.set_title("Distance between Robot and Closest Fish")
-axs6.set_xlabel('time (s)')
-axs6.set_ylabel('distance (m)')
+# fig4, axs6 = plt.subplots()
+# line1 = axs6.scatter(df['Distance: time (s)'], df['Distance: distance (m)'])
+# axs6.legend(['time (s)', 'distance (m)'])
+# axs6.set_title("Distance between Robot and Closest Fish")
+# axs6.set_xlabel('time (s)')
+# axs6.set_ylabel('distance (m)')
 
 plt.show()

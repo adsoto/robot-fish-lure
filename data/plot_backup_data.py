@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 #              https://stackoverflow.com/questions/44970881/matplotlib-multiple-scatter-subplots-with-shared-colour-bar
 
 ## Choose CSV file to read for plotting
-df = pd.read_csv('data/backup/07.26.2023/15.23.csv') # read csv file from data folder. Ex: 'data/06.13.2023/13.17.csv' reads the 13.17.csv file from the 06.13.2023 subfolder inside data folder
+df = pd.read_csv('data/backup/07.26.2023/15.40.csv') # read csv file from data folder. Ex: 'data/06.13.2023/13.17.csv' reads the 13.17.csv file from the 06.13.2023 subfolder inside data folder
 # print(df['Desired Position: y (m)'])
 # for col in df.columns:
 #     print(col)

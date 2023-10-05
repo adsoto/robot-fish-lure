@@ -5,7 +5,7 @@ import matplotlib.animation as animation
 from matplotlib.animation import FuncAnimation
 
 
-df = pd.read_csv('data/07.18.2023/11.20.csv')
+df = pd.read_csv('data/07.17.2023/16.28.csv')
 
 
 #line1 = ax.scatter(df['Desired Position: x (m)'], df['Desired Position: x (m)')
