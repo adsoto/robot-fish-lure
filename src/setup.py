@@ -5,7 +5,11 @@ import numpy as np
 from paths import *
 
 global setup
+global backgroundSub
+global displayThresh
 setup = "LAIR"
+backgroundSub = False
+displayThresh = True
 
 global bounds # find these with calibrate_setup.py
 #LAIR: [ 687  396][1483  801]
